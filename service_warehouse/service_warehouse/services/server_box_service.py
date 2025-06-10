@@ -2,7 +2,7 @@ import frappe
 
 
 class ServerBoxService:
-    @frappe.whitelist(allow_guest=False)
+    @frappe.whitelist()
     def get_user_boxes():
         """Return all Server Box documents for the tenant of the current user."""
         user = frappe.session.user
@@ -19,11 +19,14 @@ class ServerBoxService:
             "Server Box",
             filters={"tenant": tenant_name},
             fields=[
-                "name",
+                "box_information",
+                "box_ip_address",
                 "box_name",
                 "box_type",
                 "box_url",
                 "instance_name",
+                "name",
+                "notes",
                 "server_box_version",
             ],
         )
