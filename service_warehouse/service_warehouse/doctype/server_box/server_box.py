@@ -18,13 +18,13 @@ class ServerBox(Document):
 
         box_information: DF.JSON | None
         box_ip_address: DF.Data | None
-        box_name: DF.Data | None
+        box_name: DF.Data
         box_type: DF.Literal["Service Box", "Client Box"]
         box_url: DF.Data
         instance_name: DF.Data | None
         name: DF.Int | None
         notes: DF.LongText | None
-        server_box_version: DF.Link | None
+        server_box_version: DF.Link
         tenant: DF.Link | None
     # end: auto-generated types
     pass
@@ -36,7 +36,7 @@ class ServerBox(Document):
             tenant_client_box = frappe.get_all(
                 "Server Box",
                 filters={
-                    "box_type": "Service Box",
+                    "box_type": "Client Box",
                     "owner": user_data.get("name"),
                 },
                 fields=["name"],
@@ -59,8 +59,9 @@ class ServerBox(Document):
         tenant_name = tenant[0].name
         box_type = self.box_type.replace(" Box", "")
         instance_name = f"{tenant_name}-{box_type}-{self.name}"
-        self.instance_name = instance_name.lower()
-        self.save()
+        frappe.db.set_value(
+            self.doctype, self.name, "instance_name", instance_name.lower()
+        )
         frappe.db.commit()
 
 

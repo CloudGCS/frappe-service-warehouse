@@ -3,12 +3,14 @@
 
 frappe.ui.form.on("Server Box", {
 	refresh(frm) {
-		frm.add_custom_button("Get Installation Zip", function () {
-			get_zip_content(frm, "get_installation_zip");
-		});
-		frm.add_custom_button("Get Update Zip", function () {
-			get_zip_content(frm, "get_update_zip");
-		});
+		if (!frm.is_new()) {
+			frm.add_custom_button("Get Installation Zip", function () {
+				get_zip_content(frm, "get_installation_zip");
+			});
+			frm.add_custom_button("Get Update Zip", function () {
+				get_zip_content(frm, "get_update_zip");
+			});
+		}
 	},
 });
 

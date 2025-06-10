@@ -22,7 +22,8 @@
   {
    "fieldname": "box_name",
    "fieldtype": "Data",
-   "label": "Box Name"
+   "label": "Box Name",
+   "reqd": 1
   },
   {
    "fieldname": "tenant",
@@ -51,6 +52,7 @@
    "fieldtype": "Link",
    "label": "Server Box Version",
    "options": "Server Box Version",
+   "reqd": 1,
    "set_only_once": 1
   },
   {
@@ -93,7 +95,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-06-04 20:43:00.945992",
+ "modified": "2025-06-05 10:37:40.467720",
  "modified_by": "Administrator",
  "module": "Service Warehouse",
  "name": "Server Box",
