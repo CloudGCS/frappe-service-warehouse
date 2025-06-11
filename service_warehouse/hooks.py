@@ -185,9 +185,10 @@ permission_query_conditions = {
 # Overriding Methods
 # ------------------------------
 #
-# override_whitelisted_methods = {
-# 	"frappe.desk.doctype.event.event.get_events": "service_warehouse.event.get_events"
-# }
+override_whitelisted_methods = {
+    "get_user_boxes": "service_warehouse.service_warehouse.services.server_box_service.get_user_boxes",
+    "update_server_box_info_data": "service_warehouse.service_warehouse.services.server_box_service.update_server_box_info_data",
+}
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
