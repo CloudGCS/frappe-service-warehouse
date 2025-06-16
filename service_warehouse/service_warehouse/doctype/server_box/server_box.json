@@ -1,0 +1,123 @@
+{
+ "actions": [],
+ "autoname": "autoincrement",
+ "creation": "2025-06-04 16:46:45.190231",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "server_box_section",
+  "server_box_details_section",
+  "box_name",
+  "tenant",
+  "box_type",
+  "box_url",
+  "server_box_version",
+  "instance_name",
+  "box_ip_address",
+  "column_break_9bsr",
+  "box_information",
+  "notes"
+ ],
+ "fields": [
+  {
+   "fieldname": "box_name",
+   "fieldtype": "Data",
+   "label": "Box Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "tenant",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Tenant",
+   "options": "Tenant"
+  },
+  {
+   "fieldname": "box_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Box Type",
+   "options": "Service Box\nClient Box",
+   "reqd": 1
+  },
+  {
+   "fieldname": "box_url",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Box Url",
+   "reqd": 1
+  },
+  {
+   "fieldname": "server_box_version",
+   "fieldtype": "Link",
+   "label": "Server Box Version",
+   "options": "Server Box Version",
+   "reqd": 1,
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "instance_name",
+   "fieldtype": "Data",
+   "label": "Instance Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "box_ip_address",
+   "fieldtype": "Data",
+   "label": "Box Ip Address"
+  },
+  {
+   "fieldname": "box_information",
+   "fieldtype": "JSON",
+   "label": "Box Information",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_9bsr",
+   "fieldtype": "Column Break",
+   "label": "Advenved Info"
+  },
+  {
+   "fieldname": "notes",
+   "fieldtype": "Long Text",
+   "label": "Notes"
+  },
+  {
+   "fieldname": "server_box_details_section",
+   "fieldtype": "Column Break",
+   "label": "Server Box Details"
+  },
+  {
+   "fieldname": "server_box_section",
+   "fieldtype": "Section Break",
+   "label": "Server Box"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-06-05 10:37:40.467720",
+ "modified_by": "Administrator",
+ "module": "Service Warehouse",
+ "name": "Server Box",
+ "naming_rule": "Autoincrement",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "if_owner": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "select": 1,
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

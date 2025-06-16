@@ -1,0 +1,74 @@
+{
+ "actions": [],
+ "autoname": "autoincrement",
+ "creation": "2025-06-04 17:04:00.117576",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_8cl9",
+  "version_name",
+  "section_break_gl76",
+  "install_zip",
+  "update_zip"
+ ],
+ "fields": [
+  {
+   "fieldname": "version_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Version Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "update_zip",
+   "fieldtype": "Attach",
+   "label": "Update Zip",
+   "reqd": 1
+  },
+  {
+   "fieldname": "install_zip",
+   "fieldtype": "Attach",
+   "in_list_view": 1,
+   "label": "Install Zip",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_8cl9",
+   "fieldtype": "Section Break",
+   "label": "Version Information"
+  },
+  {
+   "fieldname": "section_break_gl76",
+   "fieldtype": "Section Break",
+   "label": "Zip Files"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-06-04 20:24:36.138678",
+ "modified_by": "Administrator",
+ "module": "Service Warehouse",
+ "name": "Server Box Version",
+ "naming_rule": "Autoincrement",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "show_title_field_in_link": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "version_name",
+ "translated_doctype": 1
+}
