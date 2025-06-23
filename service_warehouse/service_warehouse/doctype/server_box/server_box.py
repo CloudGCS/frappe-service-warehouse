@@ -63,6 +63,7 @@ class ServerBox(Document):
             self.doctype, self.name, "instance_name", instance_name.lower()
         )
         frappe.db.commit()
+        self.reload()
 
 
 def get_zip_file_content(server_box_id, field_name):
