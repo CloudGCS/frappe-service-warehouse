@@ -10,6 +10,7 @@ frappe.ui.form.on("Server Box", {
 			frm.add_custom_button("Get Update Zip", function () {
 				get_zip_content(frm, "get_update_zip");
 			});
+			frm.set_df_property("server_box_version", "read_only", 1);
 		}
 	},
 });

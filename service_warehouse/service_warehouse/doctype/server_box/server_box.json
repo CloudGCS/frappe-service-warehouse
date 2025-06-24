@@ -52,8 +52,7 @@
    "fieldtype": "Link",
    "label": "Server Box Version",
    "options": "Server Box Version",
-   "reqd": 1,
-   "set_only_once": 1
+   "reqd": 1
   },
   {
    "fieldname": "instance_name",
@@ -95,7 +94,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-06-05 10:37:40.467720",
+ "modified": "2025-06-24 09:47:57.834253",
  "modified_by": "Administrator",
  "module": "Service Warehouse",
  "name": "Server Box",
@@ -119,5 +118,6 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "title_field": "box_name"
 }
