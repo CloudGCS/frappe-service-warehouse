@@ -13,12 +13,11 @@ frappe.ui.form.on("Service Packet", {
       debugger;
       tenant = response.message.tenant  ;
       const isSubscribed = response.message.is_subscribed;
-      isSubscriptionPossible = frm.doc.docStatus != 1 && frm.doc.service_provider != null && tenant != null && !isSubscribed;  
+      isSubscriptionPossible = frm.doc.docStatus != 1 && frm.doc.service_provider != null && tenant != null && !isSubscribed;
     }
 
     frm.set_df_property('subscribe', 'hidden', !isSubscriptionPossible);
     frm.set_df_property('is_system_packet', 'hidden', tenant == null || tenant.name == "HOST");
-    frm.set_df_property('is_seed_data', 'hidden', tenant == null || tenant.name != "HOST");
 },
   before_submit: function(frm) {
     if (frm.doc.latest_release == null) {

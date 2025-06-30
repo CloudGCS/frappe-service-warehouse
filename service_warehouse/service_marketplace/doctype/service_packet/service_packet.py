@@ -20,7 +20,6 @@ class ServicePacket(Document):
 		amended_from: DF.Link | None
 		code_name: DF.Data
 		description: DF.Text | None
-		is_seed_data: DF.Check
 		is_system_packet: DF.Check
 		latest_release: DF.Link | None
 		service_provider: DF.Link | None
@@ -35,30 +34,23 @@ class ServicePacket(Document):
 			frappe.throw(_(f"{field_name} cannot contain underscore for doc: {self.name}"))
 
 	def before_insert(self):
-		if self.is_seed_data:
-			return
 		tenant = get_session_tenant()
 		if not tenant:
 			frappe.throw("You are not a tenant")
 
 		if not frappe.db.exists("Service Provider", tenant.service_provider):
-			frappe.throw("You are not a valid tenant with well defined service provider.")		
+			frappe.throw("You are not a valid tenant with well defined service provider.")
 		self.service_provider = tenant.service_provider
 
 		if tenant.tenant_code == "HOST":
 			self.is_system_packet = 1
-	
-	def after_insert(self):
-		if self.is_seed_data:
-			self.owner = get_host_user()
-			frappe.db.set_value("Service Packet", self.name, "owner", get_host_user())
 
 	def on_submit(self):
 		if not self.latest_release:
 				frappe.throw("Please set the latest release before submitting.")
 
 	def subscribe(self, tenant):
-		
+
 		if not tenant:
 			frappe.throw("tenant is required to subscribe to a service packet.")
 
@@ -71,7 +63,7 @@ class ServicePacket(Document):
 		service_subscription.service_packet = self.name
 		service_subscription.tenant = tenant.name
 		service_subscription.insert(ignore_permissions=True)
-		
+
 
 # this method should be called on DocType Service Packet only.
 @frappe.whitelist()
@@ -82,4 +74,3 @@ def subscribe(*args, **kwargs):
 	if not tenant:
 		frappe.throw("You are not a tenant - you are not allowed to subscribe to this service packet.")
 	packet.subscribe(tenant)
-	

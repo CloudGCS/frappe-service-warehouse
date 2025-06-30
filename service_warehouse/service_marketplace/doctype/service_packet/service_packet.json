@@ -8,7 +8,6 @@
   "code_name",
   "title",
   "latest_release",
-  "is_seed_data",
   "column_break",
   "service_provider",
   "is_system_packet",
@@ -87,14 +86,6 @@
    "fieldname": "description",
    "fieldtype": "Text",
    "label": "Description"
-  },
-  {
-   "default": "0",
-   "fieldname": "is_seed_data",
-   "fieldtype": "Check",
-   "hidden": 1,
-   "label": "Seed Data",
-   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -111,7 +102,7 @@
    "link_fieldname": "service_packet"
   }
  ],
- "modified": "2024-05-01 19:21:06.067492",
+ "modified": "2025-06-30 21:09:07.022270",
  "modified_by": "Administrator",
  "module": "Service Marketplace",
  "name": "Service Packet",
