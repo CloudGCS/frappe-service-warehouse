@@ -12,19 +12,8 @@ fixtures = [
   {"dt": "User", "filters": [["username", "in", ["host"]]]},
   {"dt": "Service Provider", "filters": [["name", "in", ["SYSTEM"]]]},
   {"dt": "Tenant", "filters": [["name", "in", ["HOST"]]]},
-  {"dt": "Service Packet", "filters": [
-                                        ["service_provider", "in", ["SYSTEM"]],
-                                        ["is_seed_data", "=", 1],
-                                        ["docstatus", "=", 1]
-                                      ] },
-  {"dt": "Service Packet Version", "filters": [
-                                                ["service_packet", "like", "SYSTEM_%"],
-                                                ["is_seed_data", "=", 1],
-                                                ["docstatus", "=", 1],
-                                                ["major", "!=", 999]
-                                              ]},
   {"dt": "Service Extension", "filters": [
-                                          ["service_provider", "in", ["SYSTEM"]], 
+                                          ["service_provider", "in", ["SYSTEM"]],
                                           ["extension_code", "not like", "%Test%"],
                                           ["extension_code", "not like", "%TEST%"]
                                         ]},
