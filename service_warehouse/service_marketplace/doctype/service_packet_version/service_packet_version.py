@@ -39,21 +39,14 @@ class ServicePacketVersion(Document):
     service_packet.save()
 
   def check_version(self):
-    # Normalize minor to 2-digit integer (e.g., 9 → 90, 1 → 10)
-    def normalize_version(major, minor):
-      minor_str = str(minor)
-      if len(minor_str) < 2:
-          minor_str = minor_str.ljust(2, '0')  # pad with zero to the right
-      return (int(major), int(minor_str))
-
-    current_version = normalize_version(self.major, self.minor)
     # self has major and minor version first retrive all the versions with same library name
     versions = frappe.get_all("Service Packet Version", filters={"service_packet": self.service_packet}, fields=["major", "minor"])
     if not versions:
       return True
     # check if the version is greater
     for version in versions:
-        existing_version = normalize_version(version.major, version.minor)
-        if existing_version >= current_version:
-            return False
+      if version.major > self.major:
+        return False
+      elif version.major == self.major and version.minor >= self.minor:
+        return False
     return True
