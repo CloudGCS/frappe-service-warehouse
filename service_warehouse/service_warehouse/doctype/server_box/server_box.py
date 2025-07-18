@@ -135,3 +135,13 @@ def get_update_zip(*args, **kwargs):
         )
     except Exception as e:
         frappe.throw(f"Error while getting update zip: {str(e)}")
+
+@frappe.whitelist()
+def custom_link_query(doctype, txt, searchfield, start, page_len, filters):
+    return frappe.db.sql("""
+        SELECT `name`, `version_name`
+        FROM `tabServer Box Version`
+        WHERE `version_name` LIKE %s
+        ORDER BY `version_name`
+        LIMIT %s OFFSET %s
+    """, ("%%%s%%" % txt, page_len, start))

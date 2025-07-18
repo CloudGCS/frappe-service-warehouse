@@ -4,14 +4,18 @@
 frappe.ui.form.on("Server Box", {
 	refresh(frm) {
 		if (!frm.is_new()) {
-			frm.add_custom_button("Get Installation Zip", function () {
-				get_zip_content(frm, "get_installation_zip");
-			});
 			frm.add_custom_button("Get Update Zip", function () {
 				get_zip_content(frm, "get_update_zip");
 			});
 			frm.set_df_property("server_box_version", "read_only", 1);
 		}
+	},
+	onload: function (frm) {
+		frm.set_query("server_box_version", () => {
+			return {
+				query: "service_warehouse.service_warehouse.doctype.server_box.server_box.custom_link_query",
+			};
+		});
 	},
 });
 

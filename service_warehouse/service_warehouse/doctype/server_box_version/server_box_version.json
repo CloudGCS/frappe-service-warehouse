@@ -45,7 +45,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-06-04 20:24:36.138678",
+ "modified": "2025-07-18 10:52:03.140701",
  "modified_by": "Administrator",
  "module": "Service Warehouse",
  "name": "Server Box Version",
@@ -60,9 +60,13 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "System Manager",
+   "role": "Host",
    "share": 1,
    "write": 1
+  },
+  {
+   "role": "System Manager",
+   "select": 1
   }
  ],
  "show_title_field_in_link": 1,
