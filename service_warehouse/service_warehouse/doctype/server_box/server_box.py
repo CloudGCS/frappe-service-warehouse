@@ -31,13 +31,11 @@ class ServerBox(Document):
 
     def validate(self):
         if self.box_type == "Service Box":
-            user = frappe.session.user
-            user_data = frappe.get_doc("User", user).as_dict()
             tenant_client_box = frappe.get_all(
                 "Server Box",
                 filters={
                     "box_type": "Client Box",
-                    "owner": user_data.get("name"),
+                    "tenant": self.tenant
                 },
                 fields=["name"],
             )
@@ -51,16 +49,12 @@ class ServerBox(Document):
             frappe.throw("Box URL must start with 'http://' or 'https://'.")
 
     def after_insert(self):
-        user = frappe.session.user
-        user_data = frappe.get_doc("User", user).as_dict()
-        tenant = frappe.get_all("Tenant", filters={"user": user_data.get("email")})
-        if not tenant or len(tenant) == 0:
-            frappe.throw("Tenant not found for the user.")
-        tenant_name = tenant[0].name
+        tenant = frappe.get_doc("Tenant", self.tenant)
         box_type = self.box_type.replace(" Box", "")
-        instance_name = f"{tenant_name}-{box_type}-{self.name}"
+        instance_name = f"{self.tenant}-{box_type}-{self.name}"
         self.instance_name = instance_name.lower()
-        self.save()
+        frappe.db.set_value(self.doctype, self.name, "owner", tenant.user, update_modified=False)
+        frappe.db.commit()
         self.reload()
 
 
@@ -86,18 +80,6 @@ def get_zip_file_content(server_box_id, field_name):
     return {"filename": file_doc.file_name, "content_base64": encoded, "success": True}
 
 
-def getNextBoxVersion(server_box_id):
-    server_box = frappe.get_doc("Server Box", server_box_id)
-    if not server_box:
-        frappe.throw(f"Server Box with ID {server_box_id} does not exist.")
-    server_box_versions = frappe.get_all("Server Box Version")
-    server_box_versions.sort(key=lambda x: x.name, reverse=True)
-    for version in server_box_versions:
-        if int(version.name) > int(server_box.server_box_version):
-            server_box_version = frappe.get_doc("Server Box Version", version)
-            return server_box_version
-    return None
-
 
 @frappe.whitelist()
 def get_installation_zip(*args, **kwargs):
@@ -112,27 +94,7 @@ def get_installation_zip(*args, **kwargs):
 def get_update_zip(*args, **kwargs):
     try:
         server_box_id = kwargs.get("server_box_id")
-        new_version = getNextBoxVersion(server_box_id)
-        if new_version is not None:
-            server_box = frappe.get_doc("Server Box", server_box_id)
-            if not server_box:
-                frappe.throw(f"Server Box with ID {server_box_id} does not exist.")
-            if not new_version.update_zip:
-                frappe.throw(
-                    f"No update zip file found for version: {new_version.name}"
-                )
-            frappe.db.set_value(
-                "Server Box", server_box.name, "server_box_version", new_version.name
-            )
-            frappe.db.commit()
-            return get_zip_file_content(server_box_id, "update_zip")
-
-        frappe.msgprint(
-            msg="You are using latest box version.",
-            title="Box Update Message!",
-            raise_exception=False,
-            indicator="yellow",
-        )
+        return get_zip_file_content(server_box_id, "update_zip")
     except Exception as e:
         frappe.throw(f"Error while getting update zip: {str(e)}")
 
