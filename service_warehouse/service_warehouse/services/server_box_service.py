@@ -32,7 +32,7 @@ def update_server_box_info_data(*args, **kwargs):
         if not box_info_data:
             frappe.throw("Box information data is required.")
         instance_name = kwargs.get("instance_name")
-        server_box_version = kwargs.get("server_box_version")
+        # server_box_version = kwargs.get("server_box_version")
         if not instance_name:
             frappe.throw("Instance name is required.")
         doc = frappe.get_doc("Server Box", {"instance_name": instance_name})
@@ -43,9 +43,9 @@ def update_server_box_info_data(*args, **kwargs):
         frappe.db.set_value(
             doc.doctype, doc.name, "box_information", json.dumps(box_info_data, indent=2)
         )
-        frappe.db.set_value(
-            doc.doctype, doc.name, "server_box_version", server_box_version
-        )
+        # frappe.db.set_value(
+        #     doc.doctype, doc.name, "server_box_version", server_box_version
+        # )
         frappe.db.commit()
         return {"message": "Server box info data updated successfully."}
     except Exception as e:
