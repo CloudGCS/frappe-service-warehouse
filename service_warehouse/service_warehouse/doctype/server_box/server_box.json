@@ -28,9 +28,9 @@
   {
    "fieldname": "tenant",
    "fieldtype": "Link",
-   "hidden": 1,
    "label": "Tenant",
-   "options": "Tenant"
+   "options": "Tenant",
+   "read_only": 1
   },
   {
    "fieldname": "box_type",
@@ -74,7 +74,7 @@
   {
    "fieldname": "column_break_9bsr",
    "fieldtype": "Column Break",
-   "label": "Advenved Info"
+   "label": "Advanced Info"
   },
   {
    "fieldname": "notes",
@@ -94,7 +94,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-06-24 09:47:57.834253",
+ "modified": "2025-07-23 11:40:55.542732",
  "modified_by": "Administrator",
  "module": "Service Warehouse",
  "name": "Server Box",
@@ -102,15 +102,20 @@
  "owner": "Administrator",
  "permissions": [
   {
+   "if_owner": 1,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  },
+  {
    "create": 1,
    "delete": 1,
    "email": 1,
    "export": 1,
-   "if_owner": 1,
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "System Manager",
+   "role": "Host",
    "select": 1,
    "share": 1,
    "write": 1

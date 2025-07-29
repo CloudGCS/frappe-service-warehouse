@@ -4,14 +4,25 @@
 frappe.ui.form.on("Server Box", {
 	refresh(frm) {
 		if (!frm.is_new()) {
-			frm.add_custom_button("Get Installation Zip", function () {
-				get_zip_content(frm, "get_installation_zip");
-			});
 			frm.add_custom_button("Get Update Zip", function () {
 				get_zip_content(frm, "get_update_zip");
 			});
-			frm.set_df_property("server_box_version", "read_only", 1);
+			change_fields_read_only_property(frm, 1);
+			if (frappe.user_roles.includes("Host"))
+				frm.add_custom_button("Get Installation Zip", function () {
+					get_zip_content(frm, "get_installation_zip");
+				});
+			frm.set_df_property("tenant", "read_only", 0);
+		} else {
+			change_fields_read_only_property(frm, 0);
 		}
+	},
+	onload: function (frm) {
+		frm.set_query("server_box_version", () => {
+			return {
+				query: "service_warehouse.service_warehouse.doctype.server_box.server_box.custom_link_query",
+			};
+		});
 	},
 });
 
@@ -40,4 +51,11 @@ function get_zip_content(frm, command) {
 			}
 		},
 	});
+}
+
+function change_fields_read_only_property(frm, read_only) {
+	frm.set_df_property("box_type", "read_only", read_only);
+	frm.set_df_property("server_box_version", "read_only", read_only);
+	frm.set_df_property("box_url", "read_only", read_only);
+	frm.set_df_property("tenant", "read_only", read_only);
 }
