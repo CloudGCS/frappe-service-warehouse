@@ -8,11 +8,12 @@ frappe.ui.form.on("Server Box", {
 				get_zip_content(frm, "get_update_zip");
 			});
 			change_fields_read_only_property(frm, 1);
-			if (frappe.user_roles.includes("Host"))
+			if (frappe.user_roles.includes("Host")) {
 				frm.add_custom_button("Get Installation Zip", function () {
 					get_zip_content(frm, "get_installation_zip");
 				});
-			frm.set_df_property("tenant", "read_only", 0);
+				frm.set_df_property("instance_name", "read_only", 0);
+			}
 		} else {
 			change_fields_read_only_property(frm, 0);
 		}
