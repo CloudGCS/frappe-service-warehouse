@@ -52,8 +52,9 @@ class ServerBox(Document):
         tenant = frappe.get_doc("Tenant", self.tenant)
         box_type = self.box_type.replace(" Box", "")
         instance_name = f"{self.tenant}-{box_type}-{self.name}"
-        self.instance_name = instance_name.lower()
+        instance_name = instance_name.lower()
         frappe.db.set_value(self.doctype, self.name, "owner", tenant.user, update_modified=False)
+        frappe.db.set_value(self.doctype, self.name, "instance_name", instance_name, update_modified=False)
         frappe.db.commit()
         self.reload()
 
