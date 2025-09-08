@@ -14,9 +14,9 @@ class ServerBoxVersion(Document):
     if TYPE_CHECKING:
         from frappe.types import DF
 
-        install_zip: DF.Attach
+        installation_file: DF.Attach
         name: DF.Int | None
-        update_zip: DF.Attach
+        update_file: DF.Attach | None
         version_name: DF.Data
     # end: auto-generated types
     pass

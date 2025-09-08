@@ -8,8 +8,8 @@
   "section_break_8cl9",
   "version_name",
   "section_break_gl76",
-  "install_zip",
-  "update_zip"
+  "installation_file",
+  "update_file"
  ],
  "fields": [
   {
@@ -21,19 +21,6 @@
    "unique": 1
   },
   {
-   "fieldname": "update_zip",
-   "fieldtype": "Attach",
-   "label": "Update Zip",
-   "reqd": 1
-  },
-  {
-   "fieldname": "install_zip",
-   "fieldtype": "Attach",
-   "in_list_view": 1,
-   "label": "Install Zip",
-   "reqd": 1
-  },
-  {
    "fieldname": "section_break_8cl9",
    "fieldtype": "Section Break",
    "label": "Version Information"
@@ -41,12 +28,29 @@
   {
    "fieldname": "section_break_gl76",
    "fieldtype": "Section Break",
-   "label": "Zip Files"
+   "label": "Setup Files"
+  },
+  {
+   "fieldname": "installation_file",
+   "fieldtype": "Attach",
+   "in_list_view": 1,
+   "label": "Installation File",
+   "reqd": 1
+  },
+  {
+   "fieldname": "update_file",
+   "fieldtype": "Attach",
+   "label": "Update File"
   }
  ],
  "index_web_pages_for_search": 1,
- "links": [],
- "modified": "2025-07-29 10:28:37.882977",
+ "links": [
+  {
+   "link_doctype": "Server Box",
+   "link_fieldname": "server_box_version"
+  }
+ ],
+ "modified": "2025-09-09 01:23:25.553296",
  "modified_by": "Administrator",
  "module": "Service Warehouse",
  "name": "Server Box Version",

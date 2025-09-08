@@ -65,15 +65,6 @@ class ServerBox(Document):
 
 
 def get_zip_file_content(server_box_id, field_name):
-    def get_next_id(current_id):
-        result = frappe.db.get_value(
-            "Server Box Version",
-            filters={"name": [">", current_id]},
-            fieldname="name",
-            order_by="name ASC",
-        )
-        return result  # Returns the next higher ID or None if not found
-
     if not server_box_id:
         frappe.throw("Server Box ID is required to get the zip file.")
     server_box = frappe.get_doc("Server Box", server_box_id)
@@ -81,35 +72,33 @@ def get_zip_file_content(server_box_id, field_name):
         frappe.throw(f"Server Box with ID {server_box_id} does not exist.")
     if not server_box.server_box_version:
         frappe.throw("Server Box Version is not set for this Server Box.")
-    if field_name == "install_zip":
-        server_box_version = frappe.get_doc(
-            "Server Box Version", server_box.server_box_version
-        )
-    elif field_name == "update_zip":
-        next_server_box_version_id = get_next_id(server_box.server_box_version)
-        if not next_server_box_version_id:
-            frappe.msgprint("You are using latest Server Box Version. No Update!")
-            return None
-        server_box_version = frappe.get_doc(
-            "Server Box Version", next_server_box_version_id
-        )
+
+    server_box_version = frappe.get_doc(
+        "Server Box Version", server_box.server_box_version
+    )
 
     file_url = getattr(server_box_version, field_name, None)
     if not file_url:
-        frappe.throw(
-            f"No file attached in field '{field_name}' for version: {server_box_version.name}"
-        )
+        if field_name == "update_file":
+            return {
+                "status": False,
+                "message": "You are using latest Server Box Version. No Update!",
+            }
+        else:
+            frappe.throw(
+                f"No file attached in field '{field_name}' for version: {server_box_version.name}"
+            )
     file_doc = frappe.get_doc("File", {"file_url": file_url})
     with open(file_doc.get_full_path(), "rb") as f:
         encoded = base64.b64encode(f.read()).decode()
-    return {"filename": file_doc.file_name, "content_base64": encoded, "success": True}
+    return {"filename": file_doc.file_name, "content_base64": encoded, "status": True}
 
 
 @frappe.whitelist()
 def get_installation_zip(*args, **kwargs):
     try:
         server_box_id = kwargs.get("server_box_id")
-        return get_zip_file_content(server_box_id, "install_zip")
+        return get_zip_file_content(server_box_id, "installation_file")
     except Exception as e:
         frappe.throw(f"Error while getting installation zip: {str(e)}")
 
@@ -118,7 +107,7 @@ def get_installation_zip(*args, **kwargs):
 def get_update_zip(*args, **kwargs):
     try:
         server_box_id = kwargs.get("server_box_id")
-        return get_zip_file_content(server_box_id, "update_zip")
+        return get_zip_file_content(server_box_id, "update_file")
     except Exception as e:
         frappe.throw(f"Error while getting update zip: {str(e)}")
 

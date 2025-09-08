@@ -40,12 +40,12 @@ def update_server_box_info_data(*args, **kwargs):
             frappe.throw(
                 f"Server Box with instance name {instance_name} does not exist."
             )
-        frappe.db.set_value(
-            doc.doctype, doc.name, "box_information", json.dumps(box_info_data, indent=2)
+        doc.box_information = json.dumps(box_info_data, indent=2)
+        server_box_version_doc = frappe.get_doc(
+            "Server Box Version", {"version_name": server_box_version}
         )
-        frappe.db.set_value(
-            doc.doctype, doc.name, "server_box_version", server_box_version
-        )
+        doc.server_box_version = server_box_version_doc
+        doc.save()
         frappe.db.commit()
         return {"message": "Server box info data updated successfully."}
     except Exception as e:
