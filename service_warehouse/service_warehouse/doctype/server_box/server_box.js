@@ -32,7 +32,7 @@ function get_zip_content(frm, command) {
 		method: `service_warehouse.service_warehouse.doctype.server_box.server_box.${command}`,
 		args: { server_box_id: frm.doc.name },
 		callback: (r) => {
-			if (r.message) {
+			if (r.message && r.message.status) {
 				const base64Data = r.message.content_base64;
 				const byteCharacters = atob(base64Data);
 				const byteNumbers = new Array(byteCharacters.length);
@@ -49,6 +49,8 @@ function get_zip_content(frm, command) {
 				link.click();
 				document.body.removeChild(link);
 				frm.reload_doc();
+			} else {
+				frappe.msgprint(r.message.message || "Failed to get the zip file.");
 			}
 		},
 	});
