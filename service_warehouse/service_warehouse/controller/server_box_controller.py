@@ -43,19 +43,13 @@ def update_server_box_info_data(*args, **kwargs):
         )
 
     try:
-        box_name = frappe.get_value(
-            "Server Box", {"instance_name": instance_name}, "name"
+        doc = frappe.get_doc("Server Box", {"instance_name": instance_name})
+        doc.box_information = json.dumps(box_info_data, indent=2)
+        server_box_version_doc = frappe.get_doc(
+            "Server Box Version", {"version_name": server_box_version}
         )
-        frappe.db.set_value(
-            "Server Box",
-            box_name,
-            "box_information",
-            json.dumps(box_info_data, indent=2),
-        )
-        if server_box_version:
-            frappe.db.set_value(
-                "Server Box", box_name, "server_box_version", server_box_version
-            )
+        doc.server_box_version = server_box_version_doc
+        doc.save()
         frappe.db.commit()
         return APIResponse.success(message="Server box info data updated successfully.")
 
