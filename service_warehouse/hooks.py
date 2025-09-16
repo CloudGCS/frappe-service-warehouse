@@ -176,8 +176,8 @@ permission_query_conditions = {
 # ------------------------------
 #
 override_whitelisted_methods = {
-    "get_user_boxes": "service_warehouse.service_warehouse.services.server_box_service.get_user_boxes",
-    "update_server_box_info_data": "service_warehouse.service_warehouse.services.server_box_service.update_server_box_info_data",
+    "get_user_boxes": "service_warehouse.service_warehouse.controller.server_box_controller.get_user_boxes",
+    "update_server_box_info_data": "service_warehouse.service_warehouse.controller.server_box_controller.update_server_box_info_data",
 }
 #
 # each overriding function accepts a `data` argument;
@@ -243,4 +243,3 @@ export_python_type_annotations = True
 # default_log_clearing_doctypes = {
 # 	"Logging DocType Name": 30  # days to retain logs
 # }
-
