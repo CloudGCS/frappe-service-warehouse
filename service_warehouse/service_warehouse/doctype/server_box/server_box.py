@@ -1,6 +1,8 @@
 # Copyright (c) 2025, CloudGCS and contributors
 # For license information, please see license.txt
 
+import re
+from urllib.parse import urlparse
 import frappe
 import base64
 
@@ -40,10 +42,8 @@ class ServerBox(Document):
                 frappe.throw(
                     "Before creating a Service Box, you must have a Client Box."
                 )
-        if not self.box_url.startswith("http://") and not self.box_url.startswith(
-            "https://"
-        ):
-            frappe.throw("Box URL must start with 'http://' or 'https://'.")
+        if not validate_box_url(self.box_url):
+            frappe.throw("Invalid Box URL: It must start with 'http://' or 'https://', and the hostname must only contain letters, numbers, dashes, and dots.")
 
     def after_insert(self):
         tenant = frappe.get_doc("Tenant", self.tenant)
@@ -63,6 +63,14 @@ class ServerBox(Document):
         frappe.db.commit()
         self.reload()
 
+
+def validate_box_url(box_url):
+    if not (box_url.startswith("http://") or box_url.startswith("https://")):
+        return False
+    hostname = urlparse(box_url).hostname
+    if not hostname or not re.match(r"^[a-zA-Z0-9][-a-zA-Z0-9.]*[a-zA-Z0-9]$", hostname):
+        return False
+    return True
 
 def get_zip_file_content(server_box_id, field_name):
     if not server_box_id:
