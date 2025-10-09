@@ -59,6 +59,6 @@ function get_zip_content(frm, command) {
 function change_fields_read_only_property(frm, read_only) {
 	frm.set_df_property("box_type", "read_only", read_only);
 	frm.set_df_property("server_box_version", "read_only", read_only);
-	frm.set_df_property("box_url", "read_only", read_only);
+	// frm.set_df_property("box_url", "read_only", read_only);
 	frm.set_df_property("tenant", "read_only", read_only);
 }

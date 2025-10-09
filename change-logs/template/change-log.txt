@@ -1,0 +1,7 @@
+```
+Warehouse Change Log
+
+[<Release-Version>] – <Release-Date>
+
+<Change-Log>
+```

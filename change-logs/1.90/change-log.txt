@@ -1,0 +1,8 @@
+```
+Cloud Base App Change Log
+
+[1.90] – 09/10/2025
+
+🔄 Changed
+- Box URL field validation added when creating a Server Box; now only URLs following standard format are allowed
+```

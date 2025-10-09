@@ -1,0 +1,64 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+
+env:
+  app_name: "service_warehouse"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get Project Version
+        id: get_app_version
+        run: |
+          version=$(grep -Po "(?<=__version__ = [\"'])[^\"']+" $app_name/__init__.py)
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Get Writable Version
+        id: get_writable_version
+        run: |
+          version=${{ steps.get_app_version.outputs.version }}
+          echo "writable_version=${version//./-}" >> $GITHUB_OUTPUT
+
+      - name: Zip files
+        run: zip -r $app_name-${{ steps.get_writable_version.outputs.writable_version }}.zip ./* -x "change-logs/*"
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_app_version.outputs.version }}
+          release_name: Release ${{ steps.get_app_version.outputs.version }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: "./${{ env.app_name }}-${{ steps.get_writable_version.outputs.writable_version }}.zip"
+          asset_name: "${{ env.app_name }}-${{ steps.get_writable_version.outputs.writable_version }}.zip"
+          asset_content_type: application/zip
+
+      - name: Create Change Log Env Path
+        id: create-change_log_file_full_path
+        run: |
+          echo "change_log_file_full_path=change-logs/${{ steps.get_app_version.outputs.version }}/change-log.txt" >> $GITHUB_OUTPUT
+
+      - name: Notify Slack
+        uses: CloudGCS/cloudgcs-github-actions/slack-notification@1.0-slack-notification
+        with:
+          change-log-file-full-path: "${{ steps.create-change_log_file_full_path.outputs.change_log_file_full_path }}"
+          version: "${{ steps.get_app_version.outputs.version }}"
+          slack-channel-id: ${{ secrets.SLACK_CHANNEL_ID }}
+          slack-bot-token: ${{ secrets.SLACK_BOT_TOKEN }}
