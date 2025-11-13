@@ -1,0 +1,75 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"kjAMJn8HR8\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Tenant Count\",\"col\":4}},{\"id\":\"b2YwZ8ORrY\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total User Count\",\"col\":4}},{\"id\":\"70hz6qmYGk\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Package Count\",\"col\":4}},{\"id\":\"e6mvZwIdG4\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Number of Subscriptions\",\"col\":4}},{\"id\":\"5g_UjRKrgB\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Service Box List\",\"col\":3}},{\"id\":\"cAxzhmIeP2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Tenant List\",\"col\":3}},{\"id\":\"q0lQZKbz4U\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Service Package List\",\"col\":3}}]",
+ "creation": "2025-10-26 20:11:48.724589",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "",
+ "idx": 0,
+ "indicator_color": "",
+ "is_hidden": 0,
+ "label": "Dashboard-Host",
+ "links": [],
+ "modified": "2025-11-13 11:43:15.471629",
+ "modified_by": "Administrator",
+ "module": "Service Warehouse",
+ "name": "Dashboard-Host",
+ "number_cards": [
+  {
+   "label": "Total User Count",
+   "number_card_name": "Total User Count"
+  },
+  {
+   "label": "Total Package Count",
+   "number_card_name": "Total Package Count"
+  },
+  {
+   "label": "Total Tenant Count",
+   "number_card_name": "Total Tenant Count"
+  },
+  {
+   "label": "Total Number of Subscriptions",
+   "number_card_name": "Total Number of Subscriptions"
+  }
+ ],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "Host"
+  }
+ ],
+ "sequence_id": 1.0,
+ "shortcuts": [
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Service Box List",
+   "link_to": "Server Box",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Tenant List",
+   "link_to": "Tenant",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Service Package List",
+   "link_to": "Service Packet",
+   "stats_filter": "[]",
+   "type": "DocType"
+  }
+ ],
+ "title": "Dashboard-Host"
+}
