@@ -5,7 +5,7 @@
    "label": "Total Service Box Count"
   }
  ],
- "content": "[{\"id\":\"0i4lzaKvxd\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Total Service Box Count\",\"col\":12}},{\"id\":\"HCn86U2stf\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Last Updated Server Boxes\",\"col\":4}},{\"id\":\"pucPoYV5t2\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Server Box List\",\"col\":4}}]",
+ "content": "[{\"id\":\"0i4lzaKvxd\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Total Service Box Count\",\"col\":12}},{\"id\":\"HCn86U2stf\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Server Box Version List\",\"col\":4}},{\"id\":\"pucPoYV5t2\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Server Box List\",\"col\":4}}]",
  "creation": "2025-10-31 10:03:40.535129",
  "custom_blocks": [],
  "docstatus": 0,
@@ -18,7 +18,7 @@
  "is_hidden": 0,
  "label": "Service Box Management",
  "links": [],
- "modified": "2025-11-13 11:44:13.759238",
+ "modified": "2025-11-13 21:28:40.589956",
  "modified_by": "Administrator",
  "module": "Service Warehouse",
  "name": "Service Box Management",
@@ -29,7 +29,7 @@
  "quick_lists": [
   {
    "document_type": "Server Box Version",
-   "label": "Last Updated Server Boxes",
+   "label": "Server Box Version List",
    "quick_list_filter": "[]"
   },
   {
@@ -39,7 +39,7 @@
   }
  ],
  "roles": [],
- "sequence_id": 4.0,
+ "sequence_id": 7.0,
  "shortcuts": [],
  "title": "Service Box Management"
 }

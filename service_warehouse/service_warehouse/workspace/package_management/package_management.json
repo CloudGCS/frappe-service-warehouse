@@ -1,6 +1,11 @@
 {
- "charts": [],
- "content": "[{\"id\":\"A_lkh4ic9z\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Number of Subscriber for System Packages\",\"col\":4}},{\"id\":\"KAmS75CjvM\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total System Packages Count\",\"col\":4}},{\"id\":\"6_o0j_taeT\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Recently Updated System Packages\",\"col\":4}},{\"id\":\"fW0sFXicxt\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"System Packages\",\"col\":4}},{\"id\":\"B5KxxF6TXD\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Service Package Version List\",\"col\":4}}]",
+ "charts": [
+  {
+   "chart_name": "System Packet Subscribtion Count",
+   "label": "System Packet Subscribtion Count"
+  }
+ ],
+ "content": "[{\"id\":\"6_o0j_taeT\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"System Package Version List\",\"col\":4}},{\"id\":\"fW0sFXicxt\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"System Packages\",\"col\":4}},{\"id\":\"gAgfM47MZP\",\"type\":\"chart\",\"data\":{\"chart_name\":\"System Packet Subscribtion Count\",\"col\":12}}]",
  "creation": "2025-10-31 09:59:37.170828",
  "custom_blocks": [],
  "docstatus": 0,
@@ -12,20 +17,11 @@
  "is_hidden": 0,
  "label": "Package Management",
  "links": [],
- "modified": "2025-11-13 11:44:23.754097",
+ "modified": "2025-11-13 19:53:13.478039",
  "modified_by": "Administrator",
  "module": "Service Warehouse",
  "name": "Package Management",
- "number_cards": [
-  {
-   "label": "Total Number of Subscriber for System Packages",
-   "number_card_name": "Total Number of Subscriber for System Packages"
-  },
-  {
-   "label": "Total System Packages Count",
-   "number_card_name": "Total Package Count"
-  }
- ],
+ "number_cards": [],
  "owner": "Administrator",
  "parent_page": "Dashboard-Host",
  "public": 1,
@@ -37,17 +33,12 @@
   },
   {
    "document_type": "Service Packet Version",
-   "label": "Service Package Version List",
-   "quick_list_filter": "[]"
-  },
-  {
-   "document_type": "Service Packet Version",
-   "label": "Recently Updated System Packages",
-   "quick_list_filter": "[]"
+   "label": "System Package Version List",
+   "quick_list_filter": "[[\"Service Packet Version\",\"owner\",\"=\",\"host@cloudgcs.com\",false]]"
   }
  ],
  "roles": [],
- "sequence_id": 3.0,
+ "sequence_id": 6.0,
  "shortcuts": [],
  "title": "Package Management"
 }

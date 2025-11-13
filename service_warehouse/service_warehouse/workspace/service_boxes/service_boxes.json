@@ -12,7 +12,7 @@
  "is_hidden": 0,
  "label": "Service Boxes",
  "links": [],
- "modified": "2025-11-13 11:45:08.032593",
+ "modified": "2025-11-13 19:53:13.331721",
  "modified_by": "Administrator",
  "module": "Service Warehouse",
  "name": "Service Boxes",
@@ -22,7 +22,7 @@
  "public": 1,
  "quick_lists": [],
  "roles": [],
- "sequence_id": 8.0,
+ "sequence_id": 2.0,
  "shortcuts": [],
  "title": "Service Boxes"
 }

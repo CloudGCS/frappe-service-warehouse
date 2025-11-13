@@ -1,0 +1,13 @@
+{
+ "creation": "2025-11-13 20:04:50.147382",
+ "docstatus": 0,
+ "doctype": "Dashboard Chart Source",
+ "idx": 0,
+ "modified": "2025-11-13 20:04:50.147382",
+ "modified_by": "Administrator",
+ "module": "Service Warehouse",
+ "name": "Tenant Service Packet Version Chart",
+ "owner": "Administrator",
+ "source_name": "Tenant Service Packet Version Chart",
+ "timeseries": 0
+}
