@@ -18,6 +18,8 @@ fixtures = [
                                           ["extension_code", "not like", "%TEST%"]
                                         ]},
   {"dt": "Role", "filters": [["name", "in", ["Host"]]]},
+  {"doctype": "Custom HTML Block"},
+
 ]
 
 

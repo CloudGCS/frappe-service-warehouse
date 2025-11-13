@@ -1,8 +1,13 @@
 {
  "charts": [],
- "content": "[{\"id\":\"5KPtw-TqJm\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Tenants\",\"col\":4}},{\"id\":\"SajR1YX05G\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Users\",\"col\":4}},{\"id\":\"7Lqya1C2ZA\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Server Boxes\",\"col\":4}}]",
+ "content": "[{\"id\":\"5KPtw-TqJm\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Tenants\",\"col\":4}},{\"id\":\"id1kOr0zo6\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Tenant Packet Subsribtion Information\",\"col\":12}},{\"id\":\"SajR1YX05G\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Users\",\"col\":4}},{\"id\":\"7Lqya1C2ZA\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Server Boxes\",\"col\":4}}]",
  "creation": "2025-10-31 09:58:36.851231",
- "custom_blocks": [],
+ "custom_blocks": [
+  {
+   "custom_block_name": "Tenant Packet Subsribtion Information",
+   "label": "Tenant Packet Subsribtion Information"
+  }
+ ],
  "docstatus": 0,
  "doctype": "Workspace",
  "for_user": "",
@@ -12,7 +17,7 @@
  "is_hidden": 0,
  "label": "Tenant Management",
  "links": [],
- "modified": "2025-11-13 19:53:13.440862",
+ "modified": "2025-11-13 21:46:35.514360",
  "modified_by": "Administrator",
  "module": "Service Warehouse",
  "name": "Tenant Management",

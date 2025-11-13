@@ -2,6 +2,8 @@ import frappe
 from frappe.utils.dashboard import cache_source
 from service_warehouse.service_warehouse.dashboard_chart_source.utils import handle_chart_parameters, fetch_chart_series_data, format_chart_data_with_periods
 from frappe.model.docstatus import DocStatus
+from collections import defaultdict
+
 
 @frappe.whitelist()
 def get_tenant_published_packets():
@@ -36,6 +38,17 @@ def get_tenant_total_service_packet_version_count():
         "route": ["list", "Service Packet Version"]
     }
     return response
+
+@frappe.whitelist(allow_guest=True)
+def get_tenant_subscribed_packets():
+    service_subscription_list = frappe.get_all(
+        "Service Subscription", fields=["name", "service_packet", "provider", "tenant"]
+    )
+    grouped = defaultdict(list)
+    for d in service_subscription_list:
+        grouped[d["tenant"]].append(d)
+
+    return dict(grouped)
 
 @frappe.whitelist()
 @cache_source # Decorator to cache the chart data
