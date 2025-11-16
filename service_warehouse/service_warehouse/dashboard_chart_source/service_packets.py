@@ -39,6 +39,26 @@ def get_tenant_total_service_packet_version_count():
     }
     return response
 
+@frappe.whitelist()
+def get_tenant_total_subscribed_packeges_count():
+    tenant_doc = get_tenant_doc()
+    if tenant_doc is None:
+        return 0
+
+    filters={"tenant": tenant_doc.name}
+
+    service_subscription_list = frappe.get_all(
+        "Service Subscription", filters=filters, fields=["name"]
+    )
+    total_count = len(service_subscription_list) or 0,
+
+    response = {
+        "value": total_count,
+        "route_options": filters,
+        "route": ["list", "Service Subscription"]
+    }
+    return response
+
 @frappe.whitelist(allow_guest=True)
 def get_tenant_subscribed_packets():
     service_subscription_list = frappe.get_all(
