@@ -7,7 +7,11 @@
   "bio": null,
   "birth_date": null,
   "block_modules": [],
+  "bulk_actions": 0,
   "bypass_restrict_ip_check_if_2fa_enabled": 0,
+  "dashboard": 0,
+  "default_app": null,
+  "default_workspace": null,
   "defaults": [],
   "desk_theme": "Light",
   "docstatus": 0,
@@ -23,6 +27,7 @@
   "follow_created_documents": 0,
   "follow_liked_documents": 0,
   "follow_shared_documents": 0,
+  "form_sidebar": 0,
   "full_name": "Ground Control System",
   "gender": null,
   "home_settings": null,
@@ -35,6 +40,7 @@
   "last_name": null,
   "last_password_reset_date": null,
   "last_reset_password_key_generated_on": "2024-04-10 04:50:33.169183",
+  "list_sidebar": 0,
   "location": null,
   "login_after": 0,
   "login_before": 0,
@@ -46,13 +52,13 @@
   "mute_sounds": 0,
   "name": "host@cloudgcs.com",
   "new_password": "",
+  "notifications": 0,
   "onboarding_status": "{}",
   "phone": null,
   "redirect_url": null,
   "reset_password_key": "5d787ab644b0229f5486d1ed94c139c6d1bf129c43b6a16ae2996610419332b2",
   "restrict_ip": null,
   "role_profile_name": null,
-  "role_profiles": [],
   "roles": [
    {
     "parent": "host@cloudgcs.com",
@@ -61,6 +67,7 @@
     "role": "System Manager"
    }
   ],
+  "search_bar": 0,
   "send_me_a_copy": 0,
   "send_welcome_email": 0,
   "simultaneous_sessions": 2,
@@ -76,10 +83,12 @@
   ],
   "thread_notify": 0,
   "time_zone": "Asia/Kolkata",
+  "timeline": 0,
   "unsubscribed": 0,
   "user_emails": [],
   "user_image": null,
   "user_type": "System User",
-  "username": "host"
+  "username": "host",
+  "view_switcher": 0
  }
 ]
