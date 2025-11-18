@@ -94,27 +94,40 @@ def get_tenant_subscribed_packets():
 @cache_source # Decorator to cache the chart data
 def get_tenant_service_packet_version_chart(chart_name=None, chart=None, no_cache=None, filters=None, from_date=None, to_date=None, timespan=None, time_interval=None, heatmap_year=None):
     tenant_doc = get_tenant_doc()
-    if tenant_doc is None:
+    if not tenant_doc:
         return None
+
     provider = frappe.get_doc("Service Provider", tenant_doc.provider_code)
-    service_packet_list = frappe.get_all("Service Packet", filters={"service_provider": provider.name}, fields=["name"])
+    packets = frappe.get_all(
+        "Service Packet",
+        filters={"service_provider": provider.name},
+        pluck="name"
+    )
 
-    labels = [service_packet["name"] for service_packet in service_packet_list]
-    data_values = []
+    version_counts = [
+        frappe.db.count("Service Packet Version", {"service_packet": name})
+        for name in packets
+    ]
 
-    for service_packet in service_packet_list:
-        # Count packets matching this version
-        count = frappe.db.count("Service Packet Version", {"service_packet": service_packet["name"]})
-        data_values.append(count)
+    subs = frappe.get_all(
+        "Service Subscription",
+        filters={"service_packet": ["in", packets]},
+        fields=["service_packet", "tenant"]
+    )
+    tenants_map = {}
+    for row in subs:
+        tenants_map.setdefault(row["service_packet"], set()).add(row["tenant"])
+
+    tenant_counts = [len(tenants_map.get(name, [])) for name in packets]
+
+    labels = packets
 
     return {
         "labels": labels,
         "datasets": [
-            {
-                "name": "Packets by Version",
-                "values": data_values
-            }
-        ]
+            {"name": "Packet Versions", "values": version_counts},
+            {"name": "Subscribed Tenants", "values": tenant_counts},
+        ],
     }
 
 def get_tenant_packages(isDraft: bool | None):
