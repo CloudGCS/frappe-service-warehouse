@@ -5,6 +5,7 @@ import re
 from urllib.parse import urlparse
 import frappe
 import base64
+import json
 
 from frappe.model.document import Document
 
@@ -17,7 +18,9 @@ class ServerBox(Document):
 
     if TYPE_CHECKING:
         from frappe.types import DF
+        from service_warehouse.box_setup_settings.doctype.installed_service_packet_version.installed_service_packet_version import InstalledServicePacketVersion
 
+        box_image_information: DF.JSON | None
         box_information: DF.JSON | None
         box_ip_address: DF.Data | None
         box_name: DF.Data
@@ -27,6 +30,7 @@ class ServerBox(Document):
         name: DF.Int | None
         notes: DF.LongText | None
         server_box_version: DF.Link
+        service_packet_versions: DF.TableMultiSelect[InstalledServicePacketVersion]
         tenant: DF.Link | None
     # end: auto-generated types
     pass
@@ -44,6 +48,22 @@ class ServerBox(Document):
                 )
         if not validate_box_url(self.box_url):
             frappe.throw("Invalid Box URL: It must start with 'http://' or 'https://', and the hostname must only contain letters, numbers, dashes, and dots.")
+
+    def before_save(self):
+        box_information = json.loads(self.box_information or "{}")
+        installed_service_packet_version_list = []
+        if box_information.get("packet_list_info") != None:
+            for packet in box_information["packet_list_info"]:
+                service_packet_version = frappe.get_all('Service Packet Version', filters={'name': packet["release_version"]})
+                installed_service_packet_version = frappe.new_doc('Installed Service Packet Version')
+                installed_service_packet_version.service_packet_version = service_packet_version[0].name
+                installed_service_packet_version.parent = self.name
+                installed_service_packet_version.parenttype = "Server Box"
+                installed_service_packet_version.parentfield = "service_packet_versions"
+                installed_service_packet_version_list.append(installed_service_packet_version)
+        self.service_packet_versions = installed_service_packet_version_list
+        if box_information.get("image_versions"):
+            self.box_image_information = json.dumps(box_information["image_versions"], indent=4)
 
     def after_insert(self):
         tenant = frappe.get_doc("Tenant", self.tenant)
