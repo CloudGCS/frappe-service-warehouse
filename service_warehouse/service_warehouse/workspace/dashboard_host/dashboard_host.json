@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"kjAMJn8HR8\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Tenant Count\",\"col\":4}},{\"id\":\"b2YwZ8ORrY\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total User Count\",\"col\":4}},{\"id\":\"70hz6qmYGk\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Package Count\",\"col\":4}},{\"id\":\"e6mvZwIdG4\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Number of Subscriptions\",\"col\":4}},{\"id\":\"5g_UjRKrgB\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Service Box List\",\"col\":3}},{\"id\":\"cAxzhmIeP2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Tenant List\",\"col\":3}},{\"id\":\"q0lQZKbz4U\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Service Package List\",\"col\":3}}]",
+ "content": "[{\"id\":\"kjAMJn8HR8\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Tenant Count\",\"col\":4}},{\"id\":\"b2YwZ8ORrY\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total User Count\",\"col\":4}},{\"id\":\"70hz6qmYGk\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Package Count\",\"col\":4}},{\"id\":\"e6mvZwIdG4\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Number of Subscriptions\",\"col\":4}},{\"id\":\"GN41JucnoM\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Server Box\",\"col\":4}},{\"id\":\"cAxzhmIeP2\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Tenant List\",\"col\":3}},{\"id\":\"q0lQZKbz4U\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Service Package List\",\"col\":3}}]",
  "creation": "2025-10-26 20:11:48.724589",
  "custom_blocks": [],
  "docstatus": 0,
@@ -13,7 +13,7 @@
  "is_hidden": 0,
  "label": "Dashboard-Host",
  "links": [],
- "modified": "2025-11-13 19:53:13.394217",
+ "modified": "2025-11-18 16:41:44.726215",
  "modified_by": "Administrator",
  "module": "Service Warehouse",
  "name": "Dashboard-Host",
@@ -21,6 +21,10 @@
   {
    "label": "Total User Count",
    "number_card_name": "Total User Count"
+  },
+  {
+   "label": "Total Server Box",
+   "number_card_name": "Server Box Count"
   },
   {
    "label": "Total Package Count",
@@ -46,14 +50,6 @@
  ],
  "sequence_id": 4.0,
  "shortcuts": [
-  {
-   "color": "Grey",
-   "doc_view": "List",
-   "label": "Service Box List",
-   "link_to": "Server Box",
-   "stats_filter": "[]",
-   "type": "DocType"
-  },
   {
    "color": "Grey",
    "doc_view": "List",
