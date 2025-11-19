@@ -140,8 +140,8 @@ def get_server_boxes_info(filter):
             lack_update = True
 
         if not sb.service_packet_versions:
-            sb.missUpdate = miss_update
-            sb.lackUpdate = lack_update
+            sb.miss_update = miss_update
+            sb.lack_update = lack_update
         else:
             for spv in sb.service_packet_versions:
                 packet_name = frappe.get_value(
@@ -158,19 +158,26 @@ def get_server_boxes_info(filter):
                         lack_update = False
                     break
 
-            sb.missUpdate = miss_update
-            sb.lackUpdate = lack_update
+            sb.miss_update = miss_update
+            sb.lack_update = lack_update
 
         sb.server_box_version = version_name_map.get(
             int(sb.server_box_version),
             sb.server_box_version
         )
 
-        processed_boxes.append(sb)
+        processed_boxes.append({
+            "name": sb.name,
+            "tenant": sb.tenant,
+            "box_name": getattr(sb, "box_name", sb.name),
+            "server_box_version": sb.server_box_version,
+            "miss_update": miss_update,
+            "lack_update": lack_update,
+        })
 
     grouped = defaultdict(list)
     for sb in processed_boxes:
-        grouped[sb.tenant].append(sb)
+        grouped[sb["tenant"]].append(sb)
 
     return {
         "latest_version": version_name_map.get(
