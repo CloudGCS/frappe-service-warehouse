@@ -4,7 +4,6 @@ from service_warehouse.service_warehouse.dashboard_chart_source.utils import han
 from frappe.model.docstatus import DocStatus
 from collections import defaultdict
 
-
 @frappe.whitelist()
 def get_tenant_published_packets():
     return get_tenant_packages(False)
@@ -89,6 +88,48 @@ def get_tenant_subscribed_packets():
         grouped[d["tenant"]].append(d)
 
     return dict(grouped)
+
+
+@frappe.whitelist()
+def get_outdated_server_boxes():
+    # 1) En son sürümü bul
+    latest_version_doc = frappe.get_all(
+        "Server Box Version",
+        order_by="name desc",
+        limit_page_length=1
+    )
+
+    if not latest_version_doc:
+        return {}
+
+    latest_version = latest_version_doc[0]["name"]
+
+    print("latest_version", latest_version)
+
+    # 2) Tüm kutuları çek
+    box_list = frappe.get_all(
+        "Server Box",
+        fields=["name", "box_name", "tenant", "server_box_version"]
+    )
+
+    print("box_list", box_list)
+
+    # 3) Güncel olmayan kutuları filtrele
+    outdated = [
+        b for b in box_list
+        if int(b["server_box_version"]) != latest_version
+    ]
+
+    grouped = defaultdict(list)
+
+    for item in outdated:
+        grouped[item["tenant"]].append(item)
+
+    return {
+        "latest_version": latest_version,
+        "tenants": grouped,
+    }
+
 
 @frappe.whitelist()
 @cache_source # Decorator to cache the chart data
