@@ -91,45 +91,94 @@ def get_tenant_subscribed_packets():
 
 
 @frappe.whitelist()
-def get_outdated_server_boxes():
-    # 1) En son sürümü bul
-    latest_version_doc = frappe.get_all(
+def get_host_server_boxes_info():
+    return get_server_boxes_info({})
+
+@frappe.whitelist()
+def get_tenant_server_boxes_info():
+    filter = {}
+    tenant_doc = get_tenant_doc()
+    if tenant_doc is not None:
+        filter["tenant"] = tenant_doc.name
+    return get_server_boxes_info(filter)
+
+def get_server_boxes_info(filter):
+    server_box_version_list = frappe.get_all(
         "Server Box Version",
+        fields=["name", "version_name"],
         order_by="name desc",
-        limit_page_length=1
+        filters=filter
     )
 
-    if not latest_version_doc:
+    if not server_box_version_list:
         return {}
 
-    latest_version = latest_version_doc[0]["name"]
-
-    print("latest_version", latest_version)
-
-    # 2) Tüm kutuları çek
-    box_list = frappe.get_all(
-        "Server Box",
-        fields=["name", "box_name", "tenant", "server_box_version"]
-    )
-
-    print("box_list", box_list)
-
-    # 3) Güncel olmayan kutuları filtrele
-    outdated = [
-        b for b in box_list
-        if int(b["server_box_version"]) != latest_version
-    ]
-
-    grouped = defaultdict(list)
-
-    for item in outdated:
-        grouped[item["tenant"]].append(item)
-
-    return {
-        "latest_version": latest_version,
-        "tenants": grouped,
+    version_name_map = {
+        v["name"]: v["version_name"]
+        for v in server_box_version_list
     }
 
+    latest_version = server_box_version_list[0]["name"]
+
+    box_list = frappe.get_all("Server Box", fields=["name"])
+    server_box_docs = [frappe.get_doc("Server Box", sb.name) for sb in box_list]
+
+    service_packet_versions = frappe.get_all(
+        "Service Packet",
+        fields=["name", "latest_release"]
+    )
+    latest_by_packet = {sp["name"]: sp["latest_release"] for sp in service_packet_versions}
+
+    processed_boxes = []
+
+    for sb in server_box_docs:
+
+        miss_update = False
+        lack_update = False
+
+        if sb.server_box_version != latest_version:
+            lack_update = True
+
+        if not sb.service_packet_versions:
+            sb.missUpdate = miss_update
+            sb.lackUpdate = lack_update
+        else:
+            for spv in sb.service_packet_versions:
+                packet_name = frappe.get_value(
+                    "Service Packet Version",
+                    spv.service_packet_version,
+                    "service_packet"
+                )
+
+                latest_release = latest_by_packet.get(packet_name)
+
+                if latest_release and latest_release != spv.service_packet_version:
+                    if lack_update:
+                        miss_update = True
+                        lack_update = False
+                    break
+
+            sb.missUpdate = miss_update
+            sb.lackUpdate = lack_update
+
+        sb.server_box_version = version_name_map.get(
+            int(sb.server_box_version),
+            sb.server_box_version
+        )
+
+        processed_boxes.append(sb)
+
+    grouped = defaultdict(list)
+    for sb in processed_boxes:
+        grouped[sb.tenant].append(sb)
+
+    return {
+        "latest_version": version_name_map.get(
+            latest_version,
+            latest_version
+        ),
+        "tenants": grouped,
+    }
 
 @frappe.whitelist()
 @cache_source # Decorator to cache the chart data

@@ -55,6 +55,8 @@ class ServerBox(Document):
         if box_information.get("packet_list_info") != None:
             for packet in box_information["packet_list_info"]:
                 service_packet_version = frappe.get_all('Service Packet Version', filters={'name': packet["release_version"]})
+                if len(service_packet_version) == 0:
+                    continue
                 installed_service_packet_version = frappe.new_doc('Installed Service Packet Version')
                 installed_service_packet_version.service_packet_version = service_packet_version[0].name
                 installed_service_packet_version.parent = self.name
