@@ -78,17 +78,53 @@ def get_tenant_total_service_box_count():
     }
     return response
 
-@frappe.whitelist(allow_guest=True)
-def get_tenant_subscribed_packets():
+@frappe.whitelist()
+def get_subscribed_packets_for_host():
+    return get_subscribed_packets()
+
+
+@frappe.whitelist()
+def get_subscribed_packets_for_tenant():
+    tenant_doc = get_tenant_doc()
+    if tenant_doc is None:
+        return {}
+
+    filters = {"tenant": tenant_doc.name}
+    return get_subscribed_packets(filters)
+
+def get_subscribed_packets(filter={}):
     service_subscription_list = frappe.get_all(
-        "Service Subscription", fields=["name", "service_packet", "provider", "tenant"]
+        "Service Subscription", filters=filter, fields=["name", "service_packet", "provider", "tenant"]
     )
+
+    # Build a lookup of packet -> status/docstatus
+    packet_names = list({d["service_packet"] for d in service_subscription_list})
+    packet_rows = frappe.get_all(
+        "Service Packet",
+        filters={"name": ["in", packet_names]} if packet_names else {},
+        fields=["name", "docstatus"]
+    )
+    packet_map = {r["name"]: r for r in packet_rows}
+    docstatus_label = {0: "Draft", 1: "Submitted", 2: "Cancelled"}
+
     grouped = defaultdict(list)
     for d in service_subscription_list:
-        grouped[d["tenant"]].append(d)
+        pkt = packet_map.get(d["service_packet"], {})
+        # Prefer explicit status field; fallback to docstatus label
+        pkt_status = pkt.get("status")
+        if not pkt_status and "docstatus" in pkt:
+            pkt_status = docstatus_label.get(pkt["docstatus"], str(pkt["docstatus"]))
+
+        processed_sb = {
+            "name": d["name"],
+            "service_packet": d["service_packet"],
+            "provider": d["provider"],
+            "tenant": d["tenant"],
+            "status": pkt_status,
+        }
+        grouped[processed_sb["tenant"]].append(processed_sb)
 
     return dict(grouped)
-
 
 @frappe.whitelist()
 def get_host_server_boxes_info():
@@ -107,7 +143,6 @@ def get_server_boxes_info(filter):
         "Server Box Version",
         fields=["name", "version_name"],
         order_by="name desc",
-        filters=filter
     )
 
     if not server_box_version_list:
@@ -120,7 +155,7 @@ def get_server_boxes_info(filter):
 
     latest_version = server_box_version_list[0]["name"]
 
-    box_list = frappe.get_all("Server Box", fields=["name"])
+    box_list = frappe.get_all("Server Box", fields=["name"], filters=filter)
     server_box_docs = [frappe.get_doc("Server Box", sb.name) for sb in box_list]
 
     service_packet_versions = frappe.get_all(
