@@ -1,8 +1,13 @@
 {
  "charts": [],
- "content": "[{\"id\":\"wom5MXaLGI\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Package Count (Excluding System Packages)\",\"col\":4}},{\"id\":\"z0QMhagwPf\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Service Packet Version List\",\"col\":4}},{\"id\":\"J53HpQX4uz\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Service Packet\",\"col\":3}}]",
+ "content": "[{\"id\":\"wom5MXaLGI\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Package Count (Excluding System Packages)\",\"col\":4}},{\"id\":\"z0QMhagwPf\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Service Packet Version List\",\"col\":4}},{\"id\":\"J53HpQX4uz\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Service Packet\",\"col\":3}},{\"id\":\"e48pDQxUVZ\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Top Service Packets for Host\",\"col\":12}}]",
  "creation": "2025-10-31 10:04:44.891142",
- "custom_blocks": [],
+ "custom_blocks": [
+  {
+   "custom_block_name": "Top Service Packets for Host",
+   "label": "Top Service Packets for Host"
+  }
+ ],
  "docstatus": 0,
  "doctype": "Workspace",
  "for_user": "",
@@ -12,7 +17,7 @@
  "is_hidden": 0,
  "label": "Service Subscription Lists",
  "links": [],
- "modified": "2025-11-13 21:29:36.284880",
+ "modified": "2025-11-21 19:40:42.601942",
  "modified_by": "Administrator",
  "module": "Service Warehouse",
  "name": "Service Subscription Lists",

@@ -130,6 +130,23 @@ def get_subscribed_packets(filter={}):
 def get_host_server_boxes_info():
     return get_server_boxes_info({})
 
+
+@frappe.whitelist()
+def get_top_service_packets(limit=5):
+    results = frappe.db.get_all(
+        "Service Subscription",
+        fields=["service_packet", "count(name) as total"],
+        group_by="service_packet",
+        order_by="total desc",
+        limit=limit
+    )
+
+    for row in results:
+        row["title"] = frappe.db.get_value("Service Packet", row.service_packet, "title")
+
+    return results
+
+
 @frappe.whitelist()
 def get_tenant_server_boxes_info():
     filter = {}
