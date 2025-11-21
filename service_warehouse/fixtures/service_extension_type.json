@@ -1,30 +1,30 @@
 [
- {
-  "docstatus": 0,
-  "doctype": "Service Extension Type",
-  "modified": "2024-04-10 04:11:02.477040",
-  "name": "PS Plugin",
-  "title": "Pilot Station Plugin - extending UI functionalities"
- },
- {
-  "docstatus": 0,
-  "doctype": "Service Extension Type",
-  "modified": "2024-04-10 04:11:52.018429",
-  "name": "MC Plugin",
-  "title": "Mission Controller Plugin - extending Autopilot functionalities"
- },
- {
-  "docstatus": 0,
-  "doctype": "Service Extension Type",
-  "modified": "2024-04-10 04:12:54.535975",
-  "name": "Web Application",
-  "title": "Frappe Application - extending User Experience"
- },
- {
-  "docstatus": 0,
-  "doctype": "Service Extension Type",
-  "modified": "2024-04-10 04:13:31.913090",
-  "name": "Service Container",
-  "title": "Service Application - extending Ground Control functionalities"
- }
+  {
+    "docstatus": 0,
+    "doctype": "Service Extension Type",
+    "modified": "2024-04-10 04:11:02.477040",
+    "name": "PS Plugin",
+    "title": "Pilot Station Plugin - extending UI functionalities"
+  },
+  {
+    "docstatus": 0,
+    "doctype": "Service Extension Type",
+    "modified": "2024-04-10 04:11:52.018429",
+    "name": "MC Plugin",
+    "title": "Mission Controller Plugin - extending Autopilot functionalities"
+  },
+  {
+    "docstatus": 0,
+    "doctype": "Service Extension Type",
+    "modified": "2024-04-10 04:12:54.535975",
+    "name": "Web Application",
+    "title": "Frappe Application - extending User Experience"
+  },
+  {
+    "docstatus": 0,
+    "doctype": "Service Extension Type",
+    "modified": "2024-04-10 04:13:31.913090",
+    "name": "Service Container",
+    "title": "Service Application - extending Ground Control functionalities"
+  }
 ]

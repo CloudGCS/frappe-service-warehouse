@@ -1,14 +1,14 @@
 [
- {
-  "docstatus": 0,
-  "doctype": "Tenant",
-  "modified": "2024-04-10 05:36:45.120505",
-  "name": "HOST",
-  "provider_code": "SYSTEM",
-  "provider_title": "The system extensions required to have minimum viable user experience",
-  "service_provider": "SYSTEM",
-  "tenant_code": "HOST",
-  "tenant_name": "Host Tenant",
-  "user": "host@cloudgcs.com"
- }
+  {
+    "docstatus": 0,
+    "doctype": "Tenant",
+    "modified": "2024-04-10 05:36:45.120505",
+    "name": "HOST",
+    "provider_code": "SYSTEM",
+    "provider_title": "The system extensions required to have minimum viable user experience",
+    "service_provider": "SYSTEM",
+    "tenant_code": "HOST",
+    "tenant_name": "Host Tenant",
+    "user": "host@cloudgcs.com"
+  }
 ]

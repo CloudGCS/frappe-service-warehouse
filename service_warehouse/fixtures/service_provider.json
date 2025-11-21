@@ -1,9 +1,9 @@
 [
- {
-  "docstatus": 0,
-  "doctype": "Service Provider",
-  "modified": "2024-04-10 05:36:50.244251",
-  "name": "SYSTEM",
-  "title": "The system extensions required to have minimum viable user experience"
- }
+  {
+    "docstatus": 0,
+    "doctype": "Service Provider",
+    "modified": "2024-04-10 05:36:50.244251",
+    "name": "SYSTEM",
+    "title": "The system extensions required to have minimum viable user experience"
+  }
 ]
