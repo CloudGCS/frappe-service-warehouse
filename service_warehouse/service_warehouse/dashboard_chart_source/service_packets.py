@@ -133,18 +133,35 @@ def get_host_server_boxes_info():
 
 @frappe.whitelist()
 def get_top_service_packets(limit=5):
-    results = frappe.db.get_all(
+    raw_results = frappe.db.get_all(
         "Service Subscription",
         fields=["service_packet", "count(name) as total"],
         group_by="service_packet",
-        order_by="total desc",
-        limit=limit
+        order_by="total desc"
     )
 
-    for row in results:
-        row["title"] = frappe.db.get_value("Service Packet", row.service_packet, "title")
+    final_results = []
 
-    return results
+    for row in raw_results:
+        packet = frappe.db.get_value(
+            "Service Packet",
+            row.service_packet,
+            ["title", "is_system_packet"],
+            as_dict=True
+        )
+
+        if packet and not packet.is_system_packet:
+            final_results.append({
+                "service_packet": row.service_packet,
+                "total": row.total,
+                "title": packet.title
+            })
+
+        if len(final_results) >= limit:
+            break
+
+    return final_results
+
 
 
 @frappe.whitelist()
