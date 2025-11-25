@@ -132,7 +132,8 @@ def get_host_server_boxes_info():
 
 
 @frappe.whitelist()
-def get_top_service_packets(limit=5):
+def get_top_service_packets(limit):
+    limit = int(limit)
     raw_results = frappe.db.get_all(
         "Service Subscription",
         fields=["service_packet", "count(name) as total"],
