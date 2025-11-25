@@ -132,7 +132,18 @@ def get_host_server_boxes_info():
 
 
 @frappe.whitelist()
-def get_top_service_packets(limit):
+def get_top_service_packets_for_host(limit):
+    return get_top_service_packets(limit)
+
+@frappe.whitelist()
+def get_top_service_packets_for_tenant(limit):
+    tenat_doc = get_tenant_doc()
+    filter = None
+    if tenat_doc is  not None:
+        filter = tenat_doc.name
+    return get_top_service_packets(limit, filter)
+
+def get_top_service_packets(limit, filter=None):
     limit = int(limit)
     raw_results = frappe.db.get_all(
         "Service Subscription",
@@ -147,23 +158,22 @@ def get_top_service_packets(limit):
         packet = frappe.db.get_value(
             "Service Packet",
             row.service_packet,
-            ["title", "is_system_packet"],
+            ["title", "service_provider"],
             as_dict=True
         )
 
-        if packet and not packet.is_system_packet:
-            final_results.append({
-                "service_packet": row.service_packet,
-                "total": row.total,
-                "title": packet.title
-            })
+        if packet and packet.service_provider != "SYSTEM":
+            if filter is None or packet.service_provider == filter:
+                final_results.append({
+                    "service_packet": row.service_packet,
+                    "total": row.total,
+                    "title": packet.title
+                })
 
         if len(final_results) >= limit:
             break
 
     return final_results
-
-
 
 @frappe.whitelist()
 def get_tenant_server_boxes_info():
