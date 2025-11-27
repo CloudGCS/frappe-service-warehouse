@@ -180,30 +180,25 @@ def get_top_service_packets(limit, filter=None):
 def get_last_updated_packets_for_tenant(limit=10):
     tenant_doc = get_tenant_doc()
 
-    service_provider_filter = tenant_doc.name if tenant_doc else None
-
-    packets = frappe.db.get_all(
-        "Service Packet",
-        fields=["name", "title", "service_provider", "modified"],
-        filters={"service_provider": service_provider_filter} if service_provider_filter else {},
-        order_by="modified desc",
-        limit=limit
-    )
-
-    return packets
+    filter = tenant_doc.name if tenant_doc else None
+    service_provider_filter = {"service_provider": filter} if filter else None
+    return get_last_updated_packets(limit=limit, service_provider_filter=service_provider_filter)
 
 @frappe.whitelist()
 def get_last_updated_packets_for_host(limit=10):
+    service_provider_filter = {"is_system_packet": 0}
+    return get_last_updated_packets(limit=limit, service_provider_filter=service_provider_filter)
+
+def get_last_updated_packets(limit=10, service_provider_filter=None):
     packets = frappe.db.get_all(
         "Service Packet",
-        fields=["name", "title", "service_provider", "modified"],
-        filters={"is_system_packet": 0},
+        fields=["name", "title", "service_provider", "modified", "latest_release"],
+        filters=service_provider_filter if service_provider_filter else {},
         order_by="modified desc",
         limit=limit
     )
+
     return packets
-
-
 
 @frappe.whitelist()
 def get_tenant_server_boxes_info():
