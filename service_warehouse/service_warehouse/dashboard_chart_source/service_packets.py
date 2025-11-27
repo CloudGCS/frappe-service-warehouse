@@ -278,6 +278,7 @@ def get_server_boxes_info(filter):
             "server_box_version": sb.server_box_version,
             "miss_update": miss_update,
             "lack_update": lack_update,
+            "service_packet_versions": sb.service_packet_versions
         })
 
     grouped = defaultdict(list)
