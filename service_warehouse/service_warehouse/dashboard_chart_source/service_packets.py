@@ -200,6 +200,44 @@ def get_last_updated_packets(limit=10, service_provider_filter=None):
 
     return packets
 
+
+@frappe.whitelist()
+def get_service_packet_versions():
+    
+    tenant = get_tenant_doc()
+    if not tenant:
+        return []
+
+    service_provider = tenant.name
+
+    packets = frappe.db.get_all(
+        "Service Packet",
+        fields=["name", "title"],
+        filters={"service_provider": service_provider},
+        order_by="modified desc"
+    )
+
+    if not packets:
+        return []
+
+    result = []
+    for packet in packets:
+        versions = frappe.db.get_all(
+            "Service Packet Version",
+            fields=["name", "service_packet", "version", "release_date"],
+            filters={"service_packet": packet["name"]},
+            order_by="release_date desc"
+        )
+
+        result.append({
+            "packet_name": packet["name"],
+            "title": packet["title"],
+            "versions": versions
+        })
+
+    return result
+
+
 @frappe.whitelist()
 def get_tenant_server_boxes_info():
     filter = {}
