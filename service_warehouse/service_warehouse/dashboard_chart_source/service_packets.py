@@ -447,7 +447,7 @@ def get_subscribed_packets_within_time_for_host(days: int = 7):
     return grouped
 
 @frappe.whitelist()
-def get_total_subscribed_packets_for_tenant():
+def get_total_subscribed_packets_for_host():
 
     filters = {
         "provider": "SYSTEM",

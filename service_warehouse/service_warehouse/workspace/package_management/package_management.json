@@ -5,9 +5,14 @@
    "label": "System Packet Subscribtion Count"
   }
  ],
- "content": "[{\"id\":\"6_o0j_taeT\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"System Package Version List\",\"col\":4}},{\"id\":\"fW0sFXicxt\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"System Packages\",\"col\":4}},{\"id\":\"gAgfM47MZP\",\"type\":\"chart\",\"data\":{\"chart_name\":\"System Packet Subscribtion Count\",\"col\":12}}]",
+ "content": "[{\"id\":\"6_o0j_taeT\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"System Package Version List\",\"col\":4}},{\"id\":\"fW0sFXicxt\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"System Packages\",\"col\":4}},{\"id\":\"gAgfM47MZP\",\"type\":\"chart\",\"data\":{\"chart_name\":\"System Packet Subscribtion Count\",\"col\":12}},{\"id\":\"4cqBskbUmh\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"System Packet Subscription List\",\"col\":12}}]",
  "creation": "2025-10-31 09:59:37.170828",
- "custom_blocks": [],
+ "custom_blocks": [
+  {
+   "custom_block_name": "System Packet Subscription List",
+   "label": "System Packet Subscription List"
+  }
+ ],
  "docstatus": 0,
  "doctype": "Workspace",
  "for_user": "",
@@ -17,7 +22,7 @@
  "is_hidden": 0,
  "label": "Package Management",
  "links": [],
- "modified": "2025-11-13 19:53:13.478039",
+ "modified": "2025-11-28 18:36:49.384264",
  "modified_by": "Administrator",
  "module": "Service Warehouse",
  "name": "Package Management",

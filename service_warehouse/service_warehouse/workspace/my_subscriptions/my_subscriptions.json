@@ -1,11 +1,15 @@
 {
  "charts": [],
- "content": "[{\"id\":\"KuZDSXEgt-\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Top Service Packets for Tenant\",\"col\":12}},{\"id\":\"0u2BuSVu6L\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Last Updated Packages For Tenant\",\"col\":12}},{\"id\":\"fkz91Vi-3y\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Service Packet Versions For Tenant\",\"col\":12}}]",
+ "content": "[{\"id\":\"KuZDSXEgt-\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Top Service Packets for Tenant\",\"col\":12}},{\"id\":\"0u2BuSVu6L\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Last Updated Packages For Tenant\",\"col\":12}},{\"id\":\"fkz91Vi-3y\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Service Packet Versions For Tenant\",\"col\":12}},{\"id\":\"_wt-xSZqH-\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Subscribed Packets For Tenant\",\"col\":12}}]",
  "creation": "2025-10-31 10:07:12.164918",
  "custom_blocks": [
   {
    "custom_block_name": "Top Service Packets for Tenant",
    "label": "Top Service Packets for Tenant"
+  },
+  {
+   "custom_block_name": "Subscribed Packets For Tenant",
+   "label": "Subscribed Packets For Tenant"
   },
   {
    "custom_block_name": "Last Updated Packages For Tenant",
@@ -25,7 +29,7 @@
  "is_hidden": 0,
  "label": "My Subscriptions",
  "links": [],
- "modified": "2025-11-27 13:35:22.875933",
+ "modified": "2025-11-28 18:24:10.700150",
  "modified_by": "Administrator",
  "module": "Service Warehouse",
  "name": "My Subscriptions",
