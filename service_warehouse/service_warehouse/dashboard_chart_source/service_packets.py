@@ -203,7 +203,7 @@ def get_last_updated_packets(limit=10, service_provider_filter=None):
 
 @frappe.whitelist()
 def get_service_packet_versions():
-    
+
     tenant = get_tenant_doc()
     if not tenant:
         return []
@@ -224,9 +224,9 @@ def get_service_packet_versions():
     for packet in packets:
         versions = frappe.db.get_all(
             "Service Packet Version",
-            fields=["name", "service_packet", "version", "release_date"],
+            fields=["name", "service_packet", "major", "minor"],
             filters={"service_packet": packet["name"]},
-            order_by="release_date desc"
+            order_by="modified desc"
         )
 
         result.append({
