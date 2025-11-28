@@ -3,6 +3,7 @@ from frappe.utils.dashboard import cache_source
 from service_warehouse.service_warehouse.dashboard_chart_source.utils import handle_chart_parameters, fetch_chart_series_data, format_chart_data_with_periods
 from frappe.model.docstatus import DocStatus
 from collections import defaultdict
+from frappe.utils import nowdate, add_to_date
 
 @frappe.whitelist()
 def get_tenant_published_packets():
@@ -82,7 +83,6 @@ def get_tenant_total_service_box_count():
 def get_subscribed_packets_for_host():
     return get_subscribed_packets()
 
-
 @frappe.whitelist()
 def get_subscribed_packets_for_tenant():
     tenant_doc = get_tenant_doc()
@@ -130,7 +130,6 @@ def get_subscribed_packets(filter={}):
 def get_host_server_boxes_info():
     return get_server_boxes_info({})
 
-
 @frappe.whitelist()
 def get_top_service_packets_for_host(limit):
     return get_top_service_packets(limit)
@@ -175,7 +174,6 @@ def get_top_service_packets(limit, filter=None):
 
     return final_results
 
-
 @frappe.whitelist()
 def get_last_updated_packets_for_tenant(limit=10):
     tenant_doc = get_tenant_doc()
@@ -199,7 +197,6 @@ def get_last_updated_packets(limit=10, service_provider_filter=None):
     )
 
     return packets
-
 
 @frappe.whitelist()
 def get_service_packet_versions():
@@ -236,7 +233,6 @@ def get_service_packet_versions():
         })
 
     return result
-
 
 @frappe.whitelist()
 def get_tenant_server_boxes_info():
@@ -408,3 +404,54 @@ def get_tenant_doc():
         return None
     tenant_doc = frappe.get_doc("Tenant", tenant)
     return tenant_doc
+
+@frappe.whitelist()
+def get_subscribed_packets_within_time_for_tenant(days: int = 7):
+    tenant_doc = get_tenant_doc()
+    if tenant_doc is None:
+        return {}
+
+    to_date = nowdate()
+    from_date = add_to_date(to_date, days=-int(days))
+
+    filters = {
+        "creation": ["between", [from_date, to_date]],
+        "tenant": ["!=", f"{tenant_doc.name}"],
+        "provider": f"{tenant_doc.name}",
+    }
+    return get_subscribed_packets(filters)
+
+@frappe.whitelist(allow_guest=True)
+def get_subscribed_packets_within_time_for_host(days: int = 7):
+    to_date = nowdate()
+    from_date = add_to_date(to_date, days=-int(days))
+
+    filters = {
+        "creation": ["between", [from_date, to_date]],
+    }
+    packet_dictionary = get_subscribed_packets(filters)
+    packet_list_copy = []
+    for key in list(packet_dictionary.keys()):
+        packet_list = packet_dictionary[key]
+        if len(packet_list) == 0:
+            continue
+        for packet in packet_list:
+            if packet["provider"] == "SYSTEM":
+                continue
+            if packet["provider"] != key:
+                packet_list_copy.append(packet)
+
+    grouped = defaultdict(list)
+    for d in packet_list_copy:
+        grouped[d["provider"]].append(d)
+    return grouped
+
+@frappe.whitelist()
+def get_total_subscribed_packets_for_tenant():
+
+    filters = {
+        "provider": "SYSTEM",
+    }
+    packet_dictionary = get_subscribed_packets(filters)
+
+    return packet_dictionary
