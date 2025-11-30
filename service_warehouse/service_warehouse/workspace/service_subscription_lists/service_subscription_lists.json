@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"wom5MXaLGI\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Package Count (Excluding System Packages)\",\"col\":4}},{\"id\":\"z0QMhagwPf\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Service Packet Version List\",\"col\":4}},{\"id\":\"J53HpQX4uz\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Service Packet\",\"col\":3}},{\"id\":\"e48pDQxUVZ\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Top Service Packets for Host\",\"col\":12}},{\"id\":\"cJ19mDbJ9z\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Last Updated Packages For Host\",\"col\":12}},{\"id\":\"ScV5tB6g7W\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Subscribed Packets for Host\",\"col\":12}}]",
+ "content": "[{\"id\":\"tICyoUG9bH\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Tenant Detailed Packet Information</b></span>\",\"col\":12}},{\"id\":\"z0QMhagwPf\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Service Packet Version List\",\"col\":12}},{\"id\":\"8-jqsCSxM0\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"e48pDQxUVZ\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Top Service Packets for Host\",\"col\":12}},{\"id\":\"7t_RN5yWk6\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"cJ19mDbJ9z\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Last Updated Packages For Host\",\"col\":12}},{\"id\":\"a4x9ekdfF6\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"ScV5tB6g7W\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Subscribed Packets for Host\",\"col\":12}}]",
  "creation": "2025-10-31 10:04:44.891142",
  "custom_blocks": [
   {
@@ -25,16 +25,11 @@
  "is_hidden": 0,
  "label": "Service Subscription Lists",
  "links": [],
- "modified": "2025-11-28 18:28:10.164289",
+ "modified": "2025-11-30 03:30:47.746916",
  "modified_by": "Administrator",
  "module": "Service Warehouse",
  "name": "Service Subscription Lists",
- "number_cards": [
-  {
-   "label": "Total Package Count (Excluding System Packages)",
-   "number_card_name": "Total Packages Count (Not System Package)"
-  }
- ],
+ "number_cards": [],
  "owner": "Administrator",
  "parent_page": "Dashboard-Host",
  "public": 1,
@@ -47,15 +42,6 @@
  ],
  "roles": [],
  "sequence_id": 8.0,
- "shortcuts": [
-  {
-   "color": "Grey",
-   "doc_view": "List",
-   "label": "Service Packet",
-   "link_to": "Service Packet",
-   "stats_filter": "[[\"Service Packet\",\"is_system_packet\",\"=\",0,false]]",
-   "type": "DocType"
-  }
- ],
+ "shortcuts": [],
  "title": "Service Subscription Lists"
 }
