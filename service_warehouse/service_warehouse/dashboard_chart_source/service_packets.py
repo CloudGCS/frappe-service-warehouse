@@ -274,8 +274,7 @@ def get_server_boxes_info(filter):
 
         miss_update = False
         lack_update = False
-
-        if sb.server_box_version != latest_version:
+        if sb.server_box_version != str(latest_version):
             lack_update = True
 
         if not sb.service_packet_versions:
