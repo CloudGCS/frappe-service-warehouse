@@ -454,4 +454,12 @@ def get_total_subscribed_packets_for_host():
     }
     packet_dictionary = get_subscribed_packets(filters)
 
-    return packet_dictionary
+    grouped = defaultdict(list)
+
+    for tenant, items in packet_dictionary.items():
+        for item in items:
+            key = item["service_packet"]
+            grouped[key].append(item)
+
+    grouped = dict(grouped)
+    return grouped
