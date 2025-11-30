@@ -1,0 +1,44 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"EMFhGnTwpp\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Tenant Detailed Information<b></b></span>\",\"col\":12}},{\"id\":\"5KPtw-TqJm\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Tenants\",\"col\":12}},{\"id\":\"AqyBGZbs6b\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"C8TbfenAXL\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">User Detailed Information<b></b></span>\",\"col\":12}},{\"id\":\"SajR1YX05G\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Users\",\"col\":12}},{\"id\":\"VyV99644f_\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"id1kOr0zo6\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Tenant Packet Subsribtion Information\",\"col\":12}}]",
+ "creation": "2025-10-31 09:58:36.851231",
+ "custom_blocks": [
+  {
+   "custom_block_name": "Host Packet Subsribtion Information",
+   "label": "Tenant Packet Subsribtion Information"
+  }
+ ],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "Tenant Management",
+ "links": [],
+ "modified": "2025-11-30 03:22:37.833010",
+ "modified_by": "Administrator",
+ "module": "Service Warehouse",
+ "name": "Tenant Management",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "Dashboard-Host",
+ "public": 1,
+ "quick_lists": [
+  {
+   "document_type": "Tenant",
+   "label": "Tenants",
+   "quick_list_filter": "[]"
+  },
+  {
+   "document_type": "User",
+   "label": "Users",
+   "quick_list_filter": "[]"
+  }
+ ],
+ "roles": [],
+ "sequence_id": 5.0,
+ "shortcuts": [],
+ "title": "Tenant Management"
+}

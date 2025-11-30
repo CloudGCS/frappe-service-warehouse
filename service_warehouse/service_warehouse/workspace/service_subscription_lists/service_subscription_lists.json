@@ -1,0 +1,47 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"tICyoUG9bH\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Tenant Detailed Packet Information</b></span>\",\"col\":12}},{\"id\":\"z0QMhagwPf\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Service Packet Version List\",\"col\":12}},{\"id\":\"8-jqsCSxM0\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"e48pDQxUVZ\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Top Service Packets for Host\",\"col\":12}},{\"id\":\"7t_RN5yWk6\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"cJ19mDbJ9z\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Last Updated Packages For Host\",\"col\":12}},{\"id\":\"a4x9ekdfF6\",\"type\":\"spacer\",\"data\":{\"col\":12}},{\"id\":\"ScV5tB6g7W\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Subscribed Packets for Host\",\"col\":12}}]",
+ "creation": "2025-10-31 10:04:44.891142",
+ "custom_blocks": [
+  {
+   "custom_block_name": "Top Service Packets for Host",
+   "label": "Top Service Packets for Host"
+  },
+  {
+   "custom_block_name": "Subscribed Packets for Host",
+   "label": "Subscribed Packets for Host"
+  },
+  {
+   "custom_block_name": "Last Updated Packages For Host",
+   "label": "Last Updated Packages For Host"
+  }
+ ],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "Service Subscription Lists",
+ "links": [],
+ "modified": "2025-11-30 03:30:47.746916",
+ "modified_by": "Administrator",
+ "module": "Service Warehouse",
+ "name": "Service Subscription Lists",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "Dashboard-Host",
+ "public": 1,
+ "quick_lists": [
+  {
+   "document_type": "Service Packet Version",
+   "label": "Service Packet Version List",
+   "quick_list_filter": "[[\"Service Packet Version\",\"owner\",\"!=\",\"host@cloudgcs.com\",false]]"
+  }
+ ],
+ "roles": [],
+ "sequence_id": 8.0,
+ "shortcuts": [],
+ "title": "Service Subscription Lists"
+}

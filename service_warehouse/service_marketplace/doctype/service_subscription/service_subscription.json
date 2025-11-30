@@ -59,9 +59,10 @@
    "label": "Provider"
   }
  ],
+ "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-04-26 00:53:09.954707",
+ "modified": "2025-11-13 15:33:23.570288",
  "modified_by": "Administrator",
  "module": "Service Marketplace",
  "name": "Service Subscription",
@@ -79,6 +80,8 @@
    "share": 1
   }
  ],
+ "row_format": "Dynamic",
+ "rows_threshold_for_grid_search": 20,
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []

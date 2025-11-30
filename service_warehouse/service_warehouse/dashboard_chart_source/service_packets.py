@@ -1,0 +1,465 @@
+import frappe
+from frappe.utils.dashboard import cache_source
+from service_warehouse.service_warehouse.dashboard_chart_source.utils import handle_chart_parameters, fetch_chart_series_data, format_chart_data_with_periods
+from frappe.model.docstatus import DocStatus
+from collections import defaultdict
+from frappe.utils import nowdate, add_to_date
+
+@frappe.whitelist()
+def get_tenant_published_packets():
+    return get_tenant_packages(False)
+
+@frappe.whitelist()
+def get_tenant_not_published_packets():
+    return get_tenant_packages(True)
+
+@frappe.whitelist()
+def get_tenant_total_packets():
+    return get_tenant_packages(None)
+
+@frappe.whitelist()
+def get_tenant_total_service_packet_version_count():
+    tenant_doc = get_tenant_doc()
+    if tenant_doc is None:
+        return 0
+
+    provider = frappe.get_doc("Service Provider", tenant_doc.provider_code)
+    filters={"service_provider": provider.name}
+    service_packet_list = frappe.get_all("Service Packet", filters=filters, fields=["name"])
+
+    total_count = 0
+    for service_packet in service_packet_list:
+        count = frappe.db.count("Service Packet Version", {"service_packet": service_packet["name"]})
+        total_count += count
+
+    response = {
+        "value": total_count or 0,
+        "route_options": filters,
+        "route": ["list", "Service Packet Version"]
+    }
+    return response
+
+@frappe.whitelist()
+def get_tenant_total_subscribed_packeges_count():
+    tenant_doc = get_tenant_doc()
+    if tenant_doc is None:
+        return 0
+
+    filters={"tenant": tenant_doc.name}
+
+    service_subscription_list = frappe.get_all(
+        "Service Subscription", filters=filters, fields=["name"]
+    )
+    total_count = len(service_subscription_list) or 0,
+
+    response = {
+        "value": total_count,
+        "route_options": filters,
+        "route": ["list", "Service Subscription"]
+    }
+    return response
+
+@frappe.whitelist()
+def get_tenant_total_service_box_count():
+    tenant_doc = get_tenant_doc()
+    if tenant_doc is None:
+        return 0
+
+    filters={"tenant": tenant_doc.name}
+
+    service_box_list = frappe.get_all(
+        "Server Box", filters=filters, fields=["box_name"]
+    )
+    total_count = len(service_box_list) or 0,
+
+    response = {
+        "value": total_count,
+        "route_options": filters,
+        "route": ["list", "Server Box"]
+    }
+    return response
+
+@frappe.whitelist()
+def get_subscribed_packets_for_host():
+    return get_subscribed_packets()
+
+@frappe.whitelist()
+def get_subscribed_packets_for_tenant():
+    tenant_doc = get_tenant_doc()
+    if tenant_doc is None:
+        return {}
+
+    filters = {"tenant": tenant_doc.name}
+    return get_subscribed_packets(filters)
+
+def get_subscribed_packets(filter={}):
+    service_subscription_list = frappe.get_all(
+        "Service Subscription", filters=filter, fields=["name", "service_packet", "provider", "tenant"]
+    )
+
+    # Build a lookup of packet -> status/docstatus
+    packet_names = list({d["service_packet"] for d in service_subscription_list})
+    packet_rows = frappe.get_all(
+        "Service Packet",
+        filters={"name": ["in", packet_names]} if packet_names else {},
+        fields=["name", "docstatus"]
+    )
+    packet_map = {r["name"]: r for r in packet_rows}
+    docstatus_label = {0: "Draft", 1: "Submitted", 2: "Cancelled"}
+
+    grouped = defaultdict(list)
+    for d in service_subscription_list:
+        pkt = packet_map.get(d["service_packet"], {})
+        # Prefer explicit status field; fallback to docstatus label
+        pkt_status = pkt.get("status")
+        if not pkt_status and "docstatus" in pkt:
+            pkt_status = docstatus_label.get(pkt["docstatus"], str(pkt["docstatus"]))
+
+        processed_sb = {
+            "name": d["name"],
+            "service_packet": d["service_packet"],
+            "provider": d["provider"],
+            "tenant": d["tenant"],
+            "status": pkt_status,
+        }
+        grouped[processed_sb["tenant"]].append(processed_sb)
+
+    return dict(grouped)
+
+@frappe.whitelist()
+def get_host_server_boxes_info():
+    return get_server_boxes_info({})
+
+@frappe.whitelist()
+def get_top_service_packets_for_host(limit):
+    return get_top_service_packets(limit)
+
+@frappe.whitelist()
+def get_top_service_packets_for_tenant(limit):
+    tenat_doc = get_tenant_doc()
+    filter = None
+    if tenat_doc is  not None:
+        filter = tenat_doc.name
+    return get_top_service_packets(limit, filter)
+
+def get_top_service_packets(limit, filter=None):
+    limit = int(limit)
+    raw_results = frappe.db.get_all(
+        "Service Subscription",
+        fields=["service_packet", "count(name) as total"],
+        group_by="service_packet",
+        order_by="total desc"
+    )
+
+    final_results = []
+
+    for row in raw_results:
+        packet = frappe.db.get_value(
+            "Service Packet",
+            row.service_packet,
+            ["title", "service_provider"],
+            as_dict=True
+        )
+
+        if packet and packet.service_provider != "SYSTEM":
+            if filter is None or packet.service_provider == filter:
+                final_results.append({
+                    "service_packet": row.service_packet,
+                    "total": row.total,
+                    "title": packet.title
+                })
+
+        if len(final_results) >= limit:
+            break
+
+    return final_results
+
+@frappe.whitelist()
+def get_last_updated_packets_for_tenant(limit=10):
+    tenant_doc = get_tenant_doc()
+
+    filter = tenant_doc.name if tenant_doc else None
+    service_provider_filter = {"service_provider": filter} if filter else None
+    return get_last_updated_packets(limit=limit, service_provider_filter=service_provider_filter)
+
+@frappe.whitelist()
+def get_last_updated_packets_for_host(limit=10):
+    service_provider_filter = {"is_system_packet": 0}
+    return get_last_updated_packets(limit=limit, service_provider_filter=service_provider_filter)
+
+def get_last_updated_packets(limit=10, service_provider_filter=None):
+    packets = frappe.db.get_all(
+        "Service Packet",
+        fields=["name", "title", "service_provider", "modified", "latest_release"],
+        filters=service_provider_filter if service_provider_filter else {},
+        order_by="modified desc",
+        limit=limit
+    )
+
+    return packets
+
+@frappe.whitelist()
+def get_service_packet_versions():
+
+    tenant = get_tenant_doc()
+    if not tenant:
+        return []
+
+    service_provider = tenant.name
+
+    packets = frappe.db.get_all(
+        "Service Packet",
+        fields=["name", "title"],
+        filters={"service_provider": service_provider},
+        order_by="modified desc"
+    )
+
+    if not packets:
+        return []
+
+    result = []
+    for packet in packets:
+        versions = frappe.db.get_all(
+            "Service Packet Version",
+            fields=["name", "service_packet", "major", "minor"],
+            filters={"service_packet": packet["name"]},
+            order_by="modified desc"
+        )
+
+        result.append({
+            "packet_name": packet["name"],
+            "title": packet["title"],
+            "versions": versions
+        })
+
+    return result
+
+@frappe.whitelist()
+def get_tenant_server_boxes_info():
+    filter = {}
+    tenant_doc = get_tenant_doc()
+    if tenant_doc is not None:
+        filter["tenant"] = tenant_doc.name
+    return get_server_boxes_info(filter)
+
+def get_server_boxes_info(filter):
+    server_box_version_list = frappe.get_all(
+        "Server Box Version",
+        fields=["name", "version_name"],
+        order_by="name desc",
+    )
+
+    if not server_box_version_list:
+        return {}
+
+    version_name_map = {
+        v["name"]: v["version_name"]
+        for v in server_box_version_list
+    }
+
+    latest_version = server_box_version_list[0]["name"]
+
+    box_list = frappe.get_all("Server Box", fields=["name"], filters=filter)
+    server_box_docs = [frappe.get_doc("Server Box", sb.name) for sb in box_list]
+
+    service_packet_versions = frappe.get_all(
+        "Service Packet",
+        fields=["name", "latest_release"]
+    )
+    latest_by_packet = {sp["name"]: sp["latest_release"] for sp in service_packet_versions}
+
+    processed_boxes = []
+
+    for sb in server_box_docs:
+
+        miss_update = False
+        lack_update = False
+
+        if sb.server_box_version != latest_version:
+            lack_update = True
+
+        if not sb.service_packet_versions:
+            sb.miss_update = miss_update
+            sb.lack_update = lack_update
+        else:
+            for spv in sb.service_packet_versions:
+                packet_name = frappe.get_value(
+                    "Service Packet Version",
+                    spv.service_packet_version,
+                    "service_packet"
+                )
+
+                latest_release = latest_by_packet.get(packet_name)
+
+                if latest_release and latest_release != spv.service_packet_version:
+                    if lack_update:
+                        miss_update = True
+                        lack_update = False
+                    break
+
+            sb.miss_update = miss_update
+            sb.lack_update = lack_update
+
+        sb.server_box_version = version_name_map.get(
+            int(sb.server_box_version),
+            sb.server_box_version
+        )
+
+        processed_boxes.append({
+            "name": sb.name,
+            "tenant": sb.tenant,
+            "box_name": getattr(sb, "box_name", sb.name),
+            "server_box_version": sb.server_box_version,
+            "miss_update": miss_update,
+            "lack_update": lack_update,
+            "service_packet_versions": sb.service_packet_versions
+        })
+
+    grouped = defaultdict(list)
+    for sb in processed_boxes:
+        grouped[sb["tenant"]].append(sb)
+
+    return {
+        "latest_version": version_name_map.get(
+            latest_version,
+            latest_version
+        ),
+        "tenants": grouped,
+    }
+
+@frappe.whitelist()
+@cache_source # Decorator to cache the chart data
+def get_tenant_service_packet_version_chart(chart_name=None, chart=None, no_cache=None, filters=None, from_date=None, to_date=None, timespan=None, time_interval=None, heatmap_year=None):
+    tenant_doc = get_tenant_doc()
+    if not tenant_doc:
+        return None
+
+    provider = frappe.get_doc("Service Provider", tenant_doc.provider_code)
+    packets = frappe.get_all(
+        "Service Packet",
+        filters={"service_provider": provider.name},
+        pluck="name"
+    )
+
+    version_counts = [
+        frappe.db.count("Service Packet Version", {"service_packet": name})
+        for name in packets
+    ]
+
+    subs = frappe.get_all(
+        "Service Subscription",
+        filters={"service_packet": ["in", packets]},
+        fields=["service_packet", "tenant"]
+    )
+    tenants_map = {}
+    for row in subs:
+        tenants_map.setdefault(row["service_packet"], set()).add(row["tenant"])
+
+    tenant_counts = [len(tenants_map.get(name, [])) for name in packets]
+
+    labels = packets
+
+    return {
+        "labels": labels,
+        "datasets": [
+            {"name": "Packet Versions", "values": version_counts},
+            {"name": "Subscribed Tenants", "values": tenant_counts},
+        ],
+    }
+
+def get_tenant_packages(isDraft: bool | None):
+    tenant_doc = get_tenant_doc()
+    if tenant_doc is None:
+        return 0
+
+    filters = {
+        "service_provider": tenant_doc.name if tenant_doc else ""
+    }
+
+    if isDraft is True:
+        filters["docstatus"] = ["!=", DocStatus.submitted()]
+    elif isDraft is False:
+        filters["docstatus"] = DocStatus.draft()
+    else:
+        pass
+
+    packages = frappe.get_all(
+        "Service Packet",
+        filters=filters,
+        order_by="creation desc",
+    )
+
+    response = {
+        "value": len(packages) or 0,
+        "route_options": filters,
+        "route": ["list", "Service Packet"]
+    }
+
+    return response
+
+def get_tenant_doc():
+    user = frappe.session.user
+    tenant = frappe.db.get_value("Tenant", filters={"user": user})
+    if tenant is None:
+        return None
+    tenant_doc = frappe.get_doc("Tenant", tenant)
+    return tenant_doc
+
+@frappe.whitelist()
+def get_subscribed_packets_within_time_for_tenant(days: int = 7):
+    tenant_doc = get_tenant_doc()
+    if tenant_doc is None:
+        return {}
+
+    to_date = nowdate()
+    from_date = add_to_date(to_date, days=-int(days))
+
+    filters = {
+        "creation": ["between", [from_date, to_date]],
+        "tenant": ["!=", f"{tenant_doc.name}"],
+        "provider": f"{tenant_doc.name}",
+    }
+    return get_subscribed_packets(filters)
+
+@frappe.whitelist(allow_guest=True)
+def get_subscribed_packets_within_time_for_host(days: int = 7):
+    to_date = nowdate()
+    from_date = add_to_date(to_date, days=-int(days))
+
+    filters = {
+        "creation": ["between", [from_date, to_date]],
+    }
+    packet_dictionary = get_subscribed_packets(filters)
+    packet_list_copy = []
+    for key in list(packet_dictionary.keys()):
+        packet_list = packet_dictionary[key]
+        if len(packet_list) == 0:
+            continue
+        for packet in packet_list:
+            if packet["provider"] == "SYSTEM":
+                continue
+            if packet["provider"] != key:
+                packet_list_copy.append(packet)
+
+    grouped = defaultdict(list)
+    for d in packet_list_copy:
+        grouped[d["provider"]].append(d)
+    return grouped
+
+@frappe.whitelist()
+def get_total_subscribed_packets_for_host():
+
+    filters = {
+        "provider": "SYSTEM",
+    }
+    packet_dictionary = get_subscribed_packets(filters)
+
+    grouped = defaultdict(list)
+
+    for tenant, items in packet_dictionary.items():
+        for item in items:
+            key = item["service_packet"]
+            grouped[key].append(item)
+
+    grouped = dict(grouped)
+    return grouped

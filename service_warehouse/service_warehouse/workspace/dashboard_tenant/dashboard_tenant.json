@@ -1,0 +1,64 @@
+{
+ "charts": [
+  {
+   "chart_name": "Service Packet Version Info Chart",
+   "label": "Service Packet Version Information"
+  }
+ ],
+ "content": "[{\"id\":\"ux60ABr5kZ\",\"type\":\"header\",\"data\":{\"text\":\"<span style=\\\"font-size: 18px; letter-spacing: 0.18px;\\\"><b>Service Packet Information</b></span>\",\"col\":12}},{\"id\":\"WMVsoKOHru\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Not Published Service Packet Count\",\"col\":4}},{\"id\":\"5-SBN8Zgo-\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Service Packet Count\",\"col\":4}},{\"id\":\"r6JKVl53-K\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Published Service Packet Count\",\"col\":4}},{\"id\":\"aWljXUD_yA\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Service Packet Version Information\",\"col\":12}},{\"id\":\"qYkK35AKPk\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Service Packet Version\",\"col\":4}},{\"id\":\"924Hj9QZam\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Subscription Count\",\"col\":4}},{\"id\":\"qIDwf1bW91\",\"type\":\"number_card\",\"data\":{\"number_card_name\":\"Total Service Box Count\",\"col\":4}},{\"id\":\"kZtXbDgu6g\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Tenant Packet Subsribtion Information\",\"col\":12}}]",
+ "creation": "2025-11-13 18:58:02.402700",
+ "custom_blocks": [
+  {
+   "custom_block_name": "Tenant Packet Subsribtion Information",
+   "label": "Tenant Packet Subsribtion Information"
+  }
+ ],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "",
+ "idx": 0,
+ "indicator_color": "",
+ "is_hidden": 0,
+ "label": "Dashboard-Tenant",
+ "links": [],
+ "modified": "2025-11-21 11:37:54.249388",
+ "modified_by": "Administrator",
+ "module": "Service Warehouse",
+ "name": "Dashboard-Tenant",
+ "number_cards": [
+  {
+   "label": "Total Not Published Service Packet Count",
+   "number_card_name": "Total Not Published Service Packet Count"
+  },
+  {
+   "label": "Total Subscription Count",
+   "number_card_name": "Total Number Of Subscribtion for Current Tenant"
+  },
+  {
+   "label": "Total Service Box Count",
+   "number_card_name": "Total Service Box Count for Current Tenant"
+  },
+  {
+   "label": "Total Service Packet Count",
+   "number_card_name": "Total Service Packet Count"
+  },
+  {
+   "label": "Total Service Packet Version",
+   "number_card_name": "Total Service Packet Version Count"
+  },
+  {
+   "label": "Total Published Service Packet Count",
+   "number_card_name": "Total Published Service Packet Count"
+  }
+ ],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [],
+ "sequence_id": 1.0,
+ "shortcuts": [],
+ "title": "Dashboard-Tenant"
+}

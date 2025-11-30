@@ -1,0 +1,38 @@
+{
+ "based_on": "",
+ "chart_name": "Total Service Box Count",
+ "chart_type": "Group By",
+ "creation": "2025-10-28 10:56:48.476841",
+ "currency": "",
+ "docstatus": 0,
+ "doctype": "Dashboard Chart",
+ "document_type": "Server Box",
+ "dynamic_filters_json": "[]",
+ "filters_json": "[]",
+ "group_by_based_on": "tenant",
+ "group_by_type": "Count",
+ "idx": 0,
+ "is_public": 1,
+ "is_standard": 1,
+ "last_synced_on": "2025-10-28 13:33:49.899737",
+ "modified": "2025-10-28 13:34:04.768460",
+ "modified_by": "host@cloudgcs.com",
+ "module": "Service Warehouse",
+ "name": "Total Service Box Count",
+ "number_of_groups": 0,
+ "owner": "Administrator",
+ "parent_document_type": "",
+ "roles": [
+  {
+   "role": "Host"
+  }
+ ],
+ "source": "",
+ "time_interval": "Yearly",
+ "timeseries": 0,
+ "timespan": "Last Year",
+ "type": "Bar",
+ "use_report_chart": 0,
+ "value_based_on": "",
+ "y_axis": []
+}

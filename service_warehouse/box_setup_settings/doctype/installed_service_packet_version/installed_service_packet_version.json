@@ -1,0 +1,31 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-11-18 17:34:16.185651",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "service_packet_version"
+ ],
+ "fields": [
+  {
+   "fieldname": "service_packet_version",
+   "fieldtype": "Link",
+   "label": "Service Packet Version",
+   "options": "Service Packet Version"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-11-18 17:35:20.708103",
+ "modified_by": "Administrator",
+ "module": "Box Setup Settings",
+ "name": "Installed Service Packet Version",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

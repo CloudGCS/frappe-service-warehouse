@@ -6,17 +6,21 @@
  "engine": "InnoDB",
  "field_order": [
   "server_box_section",
-  "server_box_details_section",
+  "column_break_nos7",
   "box_name",
-  "tenant",
   "box_type",
+  "tenant",
   "box_url",
   "server_box_version",
   "instance_name",
   "box_ip_address",
+  "server_box_details_section",
+  "notes",
+  "section_break_9fdf",
+  "service_packet_versions",
   "column_break_9bsr",
   "box_information",
-  "notes"
+  "box_image_information"
  ],
  "fields": [
   {
@@ -68,13 +72,13 @@
   {
    "fieldname": "box_information",
    "fieldtype": "JSON",
+   "hidden": 1,
    "label": "Box Information",
    "read_only": 1
   },
   {
    "fieldname": "column_break_9bsr",
-   "fieldtype": "Column Break",
-   "label": "Advanced Info"
+   "fieldtype": "Column Break"
   },
   {
    "fieldname": "notes",
@@ -90,11 +94,33 @@
    "fieldname": "server_box_section",
    "fieldtype": "Section Break",
    "label": "Server Box"
+  },
+  {
+   "fieldname": "service_packet_versions",
+   "fieldtype": "Table MultiSelect",
+   "is_virtual": 1,
+   "label": "Service Packet Versions",
+   "options": "Installed Service Packet Version"
+  },
+  {
+   "fieldname": "section_break_9fdf",
+   "fieldtype": "Section Break",
+   "label": "Server Box Packet Information"
+  },
+  {
+   "fieldname": "column_break_nos7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "box_image_information",
+   "fieldtype": "JSON",
+   "is_virtual": 1,
+   "label": "Box Image Information"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-23 11:40:55.542732",
+ "modified": "2025-11-18 17:57:34.405269",
  "modified_by": "Administrator",
  "module": "Service Warehouse",
  "name": "Server Box",
