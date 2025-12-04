@@ -23,7 +23,7 @@
  "is_hidden": 0,
  "label": "Service Box Management",
  "links": [],
- "modified": "2025-11-30 15:12:23.047462",
+ "modified": "2025-12-04 07:17:31.343703",
  "modified_by": "Administrator",
  "module": "Service Warehouse",
  "name": "Service Box Management",
@@ -43,7 +43,11 @@
    "quick_list_filter": "[]"
   }
  ],
- "roles": [],
+ "roles": [
+  {
+   "role": "Host"
+  }
+ ],
  "sequence_id": 7.0,
  "shortcuts": [],
  "title": "Service Box Management"

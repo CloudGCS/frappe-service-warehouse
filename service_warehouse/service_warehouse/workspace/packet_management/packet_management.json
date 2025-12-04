@@ -17,15 +17,16 @@
  "doctype": "Workspace",
  "for_user": "",
  "hide_custom": 0,
+ "icon": "",
  "idx": 0,
- "indicator_color": "green",
+ "indicator_color": "",
  "is_hidden": 0,
- "label": "Package Management",
+ "label": "Packet Management",
  "links": [],
- "modified": "2025-11-28 18:36:49.384264",
+ "modified": "2025-12-04 07:42:10.194398",
  "modified_by": "Administrator",
  "module": "Service Warehouse",
- "name": "Package Management",
+ "name": "Packet Management",
  "number_cards": [],
  "owner": "Administrator",
  "parent_page": "Dashboard-Host",
@@ -42,8 +43,12 @@
    "quick_list_filter": "[[\"Service Packet Version\",\"owner\",\"=\",\"host@cloudgcs.com\",false]]"
   }
  ],
- "roles": [],
+ "roles": [
+  {
+   "role": "Host"
+  }
+ ],
  "sequence_id": 6.0,
  "shortcuts": [],
- "title": "Package Management"
+ "title": "Packet Management"
 }

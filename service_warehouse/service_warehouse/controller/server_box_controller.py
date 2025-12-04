@@ -48,7 +48,7 @@ def update_server_box_info_data(*args, **kwargs):
         server_box_version_doc = frappe.get_doc(
             "Server Box Version", {"version_name": server_box_version}
         )
-        doc.server_box_version = server_box_version_doc
+        doc.server_box_version = server_box_version_doc.name
         doc.save()
         frappe.db.commit()
         return APIResponse.success(message="Server box info data updated successfully.")

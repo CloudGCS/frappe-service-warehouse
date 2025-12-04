@@ -16,6 +16,7 @@
   "box_ip_address",
   "server_box_details_section",
   "notes",
+  "datasync_user_information",
   "section_break_9fdf",
   "service_packet_versions",
   "column_break_9bsr",
@@ -116,11 +117,17 @@
    "fieldtype": "JSON",
    "is_virtual": 1,
    "label": "Box Image Information"
+  },
+  {
+   "fieldname": "datasync_user_information",
+   "fieldtype": "JSON",
+   "is_virtual": 1,
+   "label": "DataSync User Information"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-11-18 17:57:34.405269",
+ "modified": "2025-12-04 07:34:10.146308",
  "modified_by": "Administrator",
  "module": "Service Warehouse",
  "name": "Server Box",

@@ -26,6 +26,7 @@ class ServerBox(Document):
         box_name: DF.Data
         box_type: DF.Literal["Service Box", "Client Box"]
         box_url: DF.Data
+        datasync_user_information: DF.JSON | None
         instance_name: DF.Data | None
         name: DF.Int | None
         notes: DF.LongText | None
@@ -35,21 +36,7 @@ class ServerBox(Document):
     # end: auto-generated types
     pass
 
-    def validate(self):
-        if self.box_type == "Service Box":
-            tenant_client_box = frappe.get_all(
-                "Server Box",
-                filters={"box_type": "Client Box", "tenant": self.tenant},
-                fields=["name"],
-            )
-            if len(tenant_client_box) == 0:
-                frappe.throw(
-                    "Before creating a Service Box, you must have a Client Box."
-                )
-        if not validate_box_url(self.box_url):
-            frappe.throw("Invalid Box URL: It must start with 'http://' or 'https://', and the hostname must only contain letters, numbers, dashes, and dots.")
-
-    def before_save(self):
+    def onload(self):
         box_information = json.loads(self.box_information or "{}")
         installed_service_packet_version_list = []
         if box_information.get("packet_list_info") != None:
@@ -66,6 +53,22 @@ class ServerBox(Document):
         self.service_packet_versions = installed_service_packet_version_list
         if box_information.get("image_versions"):
             self.box_image_information = json.dumps(box_information["image_versions"], indent=4)
+        if box_information.get("data_sync_user"):
+            self.datasync_user_information = json.dumps(box_information["data_sync_user"], indent=4)
+
+    def validate(self):
+        if self.box_type == "Service Box":
+            tenant_client_box = frappe.get_all(
+                "Server Box",
+                filters={"box_type": "Client Box", "tenant": self.tenant},
+                fields=["name"],
+            )
+            if len(tenant_client_box) == 0:
+                frappe.throw(
+                    "Before creating a Service Box, you must have a Client Box."
+                )
+        if not validate_box_url(self.box_url):
+            frappe.throw("Invalid Box URL: It must start with 'http://' or 'https://', and the hostname must only contain letters, numbers, dashes, and dots.")
 
     def after_insert(self):
         tenant = frappe.get_doc("Tenant", self.tenant)
