@@ -21,6 +21,7 @@
   "is_background_plugin",
   "is_build_in",
   "file",
+  "files",
   "config"
  ],
  "fields": [
@@ -46,7 +47,6 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Service Provider",
-   "not_nullable": 1,
    "options": "Service Provider",
    "read_only": 1
   },
@@ -84,7 +84,7 @@
    "description": "NOTE: attach file after creation",
    "fieldname": "file",
    "fieldtype": "Attach",
-   "label": "File"
+   "label": "Build"
   },
   {
    "fieldname": "version",
@@ -109,6 +109,12 @@
    "fieldname": "description",
    "fieldtype": "Text",
    "label": "Description"
+  },
+  {
+   "fieldname": "files",
+   "fieldtype": "Table",
+   "label": "Files",
+   "options": "Service Extension File"
   },
   {
    "fieldname": "plugin_info",
@@ -147,7 +153,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-03 02:22:41.416586",
+ "modified": "2026-04-01 00:23:03.188282",
  "modified_by": "Administrator",
  "module": "Service Marketplace",
  "name": "Service Extension",
