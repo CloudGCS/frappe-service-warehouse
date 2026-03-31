@@ -5,7 +5,6 @@
 import os
 import frappe
 from frappe.model.document import Document
-
 from frappe import _
 from service_warehouse.service_warehouse.doctype.tenant.tenant import get_host_user, get_session_tenant
 
@@ -17,31 +16,70 @@ class ServiceExtension(Document):
 
 	if TYPE_CHECKING:
 		from frappe.types import DF
+		from service_warehouse.service_marketplace.doctype.service_extension_file.service_extension_file import ServiceExtensionFile
 
 		config: DF.JSON | None
 		description: DF.Text | None
 		extension_code: DF.Data
 		extension_type: DF.Link
 		file: DF.Attach | None
+		files: DF.Table[ServiceExtensionFile]
 		is_background_plugin: DF.Check
 		is_build_in: DF.Check
 		library_name: DF.Data
 		major: DF.Int
 		minor: DF.Int
-		service_provider: DF.Link
+		service_provider: DF.Link | None
 		title: DF.Data
 		version: DF.Data | None
 	# end: auto-generated types
 
 	def validate(self):
 		self.check_for_underscore("Extension Code", self.extension_code)
-
+		self.rename_uploaded_file()
 
 	def check_for_underscore(self, field_name, value):
 		if "_" in value:
 			frappe.throw(_(f"{field_name} cannot contain underscore for doc: {self.name}"))
 
-	
+	def rename_uploaded_file(self):
+		"""Rename uploaded file to libraryName@version.ext format"""
+		if not self.file or not self.library_name:
+			return
+
+		# Check if file field changed
+		if self.has_value_changed("file"):
+			# Get the File document
+			file_doc = frappe.get_doc("File", {"file_url": self.file})
+
+			# Get file extension
+			_, ext = os.path.splitext(self.file)
+
+			# Create new filename: libraryName@version.ext
+			new_filename = f"{self.library_name}@{self.major}.{self.minor}{ext}"
+
+			# Get current file path
+			old_path = frappe.get_site_path(file_doc.file_url.lstrip('/'))
+
+			# Create new file path
+			file_dir = os.path.dirname(old_path)
+			new_path = os.path.join(file_dir, new_filename)
+
+			# Rename physical file
+			if os.path.exists(old_path) and old_path != new_path:
+				os.rename(old_path, new_path)
+
+				# Update File document with new filename and file_name
+				file_doc.file_name = new_filename
+				file_doc.file_url = os.path.join(os.path.dirname(file_doc.file_url), new_filename)
+				file_doc.save(ignore_permissions=True)
+
+				# Update self.file
+				self.file = file_doc.file_url
+
+				# Update self.file
+				self.file = file_doc.file_url
+
 	def before_insert(self):
 		user = frappe.session.user
 		# todo: we need to make a better check for fixtures - this is a temporary fix
@@ -68,7 +106,7 @@ class ServiceExtension(Document):
 		if not tenant:
 			frappe.throw("You are not a tenant")
 		if not frappe.db.exists("Service Provider", tenant.service_provider):
-			frappe.throw("You are not a valid tenant with well defined service provider.")		
+			frappe.throw("You are not a valid tenant with well defined service provider.")
 		self.service_provider = tenant.service_provider
 
 		if not self.is_version_valid():
@@ -78,12 +116,27 @@ class ServiceExtension(Document):
 		if self.owner == "Administrator" and self.service_provider == "SYSTEM":
 			self.owner = get_host_user()
 			frappe.db.set_value("Service Extension", self.name, "owner", get_host_user())
+		if not self.files:
+			return
+		for row in self.files:
+			if not row.se_file:
+				continue
+			if frappe.db.exists("File", {"file_url": row.se_file, "attached_to_name": self.name}):
+				continue
+			file_doc = frappe.new_doc("File")
+			file_doc.file_url = row.se_file
+			file_doc.file_name = os.path.basename(row.se_file)
+			file_doc.attached_to_doctype = self.doctype
+			file_doc.attached_to_name = self.name
+			file_doc.attached_to_field = "files"
+			file_doc.insert(ignore_permissions=True)
 
 	def is_version_valid(self):
 		# self has major and minor version first retrive all the versions with same library name
-		versions = frappe.get_all("Service Extension", 
-														filters={"service_provider": self.service_provider, "extension_code": self.extension_code, "extension_type": self.extension_type}, 
+		versions = frappe.get_all("Service Extension",
+														filters={"service_provider": self.service_provider, "extension_code": self.extension_code, "extension_type": self.extension_type},
 														fields=["major", "minor"])
+
 		if not versions:
 			return True
 		# check if the version is greater
