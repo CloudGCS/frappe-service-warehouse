@@ -140,13 +140,12 @@ permission_query_conditions = {
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+    "File": {
+        "before_insert": "service_warehouse.overrides.file_override.validate_file",
+        "after_insert": "service_warehouse.overrides.file_override.on_update_file",
+    }
+}
 
 # Scheduled Tasks
 # ---------------
