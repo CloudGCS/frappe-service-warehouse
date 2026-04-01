@@ -4,7 +4,7 @@ import frappe
 
 @frappe.whitelist()
 def check_update(tenant_code):
-	
+
 	# get service subscription filter by tenant
 	service_packets = frappe.get_all("Service Subscription", fields=["service_packet"],
 									 filters={"tenant": tenant_code})
@@ -31,7 +31,7 @@ def get_config_wout_format(config):
 
 @frappe.whitelist()
 def get_service_package(packet_release_version):
-	
+
 	packet_name = "_".join(packet_release_version.split("_")[:-1])
 
 	service_package = frappe.get_doc("Service Packet", packet_name)
@@ -64,7 +64,8 @@ def get_service_package(packet_release_version):
 			"is_background_plugin": extension_doc.is_background_plugin,
 			"is_build_in": extension_doc.is_build_in,
 			"file": extension_doc.file,
-			"config": json.loads(extension_doc.config) if extension_doc.config else {}
+			"config": json.loads(extension_doc.config) if extension_doc.config else {},
+			"files": extension_doc.files
 		}
 		extension_docs.append(extension_model)
 
