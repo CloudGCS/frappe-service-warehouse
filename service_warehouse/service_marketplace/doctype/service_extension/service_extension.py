@@ -112,6 +112,24 @@ class ServiceExtension(Document):
 		if not self.is_version_valid():
 			frappe.throw("Your version number should progress, can not be downgrading from the latest version created.")
 
+		self._check_duplicate_from_other_owner()
+
+	def _check_duplicate_from_other_owner(self):
+		"""Prevent inserting an extension that is a copy of another user's extension."""
+		existing_owner = frappe.db.get_value(
+			"Service Extension",
+			{
+				"extension_code": self.extension_code,
+				"extension_type": self.extension_type,
+				"major": self.major,
+				"minor": self.minor,
+				"service_provider": ["!=", self.service_provider],
+			},
+			"owner",
+		)
+		if existing_owner and existing_owner != frappe.session.user:
+			frappe.throw(_("You cannot duplicate a service extension that belongs to another provider."))
+
 	def after_insert(self):
 		if self.owner == "Administrator" and self.service_provider == "SYSTEM":
 			self.owner = get_host_user()

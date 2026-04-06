@@ -2,6 +2,11 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Service Packet", {
+	refresh: function (frm) {
+		if (!frm.is_new() && frm.doc.owner && frm.doc.owner !== frappe.session.user) {
+			frm.page.remove_menu_item(__("Duplicate"));
+		}
+	},
 	onload: async function (frm) {
 		const response = await frappe.call({
 			method: "service_warehouse.service_warehouse.doctype.tenant.tenant.check_tenant_subscription",
