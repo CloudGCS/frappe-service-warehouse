@@ -1,37 +1,6 @@
 // Copyright (c) 2024, a-techsyn and contributors
 // For license information, please see license.txt
 
-frappe.listview_settings["Service Packet"] = {
-	_subscribed_packets: null,
-	_loaded: false,
-
-	onload: function (listview) {
-		frappe.listview_settings["Service Packet"]._loaded = false;
-		frappe.call({
-			method: "service_warehouse.service_marketplace.doctype.service_packet.service_packet.get_subscribed_packet_names",
-			callback: function (r) {
-				const settings = frappe.listview_settings["Service Packet"];
-				settings._loaded = true;
-				if (r.message !== null && r.message !== undefined) {
-					settings._subscribed_packets = new Set(r.message);
-				} else {
-					settings._subscribed_packets = null;
-				}
-				listview.refresh();
-			},
-		});
-	},
-
-	get_indicator: function (doc) {
-		const settings = frappe.listview_settings["Service Packet"];
-		if (!settings._loaded || settings._subscribed_packets === null) return null;
-		if (settings._subscribed_packets.has(doc.name)) {
-			return [__("Subscribed"), "green", ""];
-		}
-		return [__("Not Subscribed"), "gray", ""];
-	},
-};
-
 frappe.ui.form.on("Service Packet", {
 	onload: async function (frm) {
 		const response = await frappe.call({

@@ -8,6 +8,7 @@
   "code_name",
   "title",
   "latest_release",
+  "is_subscribed",
   "column_break",
   "service_provider",
   "is_system_packet",
@@ -86,6 +87,14 @@
    "fieldname": "description",
    "fieldtype": "Text",
    "label": "Description"
+  },
+  {
+   "fieldname": "is_subscribed",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "in_list_view": 1,
+   "label": "Subscribed",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
@@ -102,8 +111,8 @@
    "link_fieldname": "service_packet"
   }
  ],
- "modified": "2025-06-30 21:09:07.022270",
- "modified_by": "Administrator",
+ "modified": "2026-04-06 14:12:42.077966",
+ "modified_by": "agncglu+1@gmail.com",
  "module": "Service Marketplace",
  "name": "Service Packet",
  "naming_rule": "By fieldname",
@@ -138,6 +147,7 @@
    "write": 1
   }
  ],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []

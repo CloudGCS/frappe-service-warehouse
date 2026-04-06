@@ -65,6 +65,19 @@ class ServicePacket(Document):
 		service_subscription.insert(ignore_permissions=True)
 
 
+@frappe.whitelist()
+def get_subscribed_packets():
+	from service_warehouse.service_warehouse.doctype.tenant.tenant import get_session_tenant
+	tenant = get_session_tenant()
+	if not tenant:
+		return []
+	return frappe.get_all(
+		"Service Subscription",
+		filters={"tenant": tenant.name},
+		pluck="service_packet"
+	)
+
+
 # this method should be called on DocType Service Packet only.
 @frappe.whitelist()
 def subscribe(*args, **kwargs):
@@ -74,16 +87,3 @@ def subscribe(*args, **kwargs):
 	if not tenant:
 		frappe.throw("You are not a tenant - you are not allowed to subscribe to this service packet.")
 	packet.subscribe(tenant)
-
-
-@frappe.whitelist()
-def get_subscribed_packet_names():
-	tenant = get_session_tenant()
-	if not tenant:
-		return None
-	subscriptions = frappe.get_all(
-		"Service Subscription",
-		filters={"tenant": tenant.name},
-		fields=["service_packet"],
-	)
-	return [s.service_packet for s in subscriptions]
