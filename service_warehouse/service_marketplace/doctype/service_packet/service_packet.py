@@ -45,6 +45,18 @@ class ServicePacket(Document):
 		if tenant.tenant_code == "HOST":
 			self.is_system_packet = 1
 
+		self._check_duplicate_from_other_owner()
+
+	def _check_duplicate_from_other_owner(self):
+		"""Prevent inserting a packet whose code_name already exists under a different owner."""
+		existing_owner = frappe.db.get_value(
+			"Service Packet",
+			{"code_name": self.code_name},
+			"owner",
+		)
+		if existing_owner and existing_owner != frappe.session.user:
+			frappe.throw(_("You cannot duplicate a service packet that belongs to another user."))
+
 	def on_submit(self):
 		if not self.latest_release:
 				frappe.throw("Please set the latest release before submitting.")

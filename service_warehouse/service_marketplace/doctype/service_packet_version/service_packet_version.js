@@ -3,6 +3,9 @@
 
 frappe.ui.form.on("Service Packet Version", {
   refresh: async function(frm) {
+		if (!frm.is_new() && frm.doc.owner && frm.doc.owner !== frappe.session.user) {
+			frm.page.remove_menu_item(__("Duplicate"));
+		}
 		const response = await frappe.call({
       method: "service_warehouse.service_warehouse.doctype.tenant.tenant.get_session_tenant",
       args: {}

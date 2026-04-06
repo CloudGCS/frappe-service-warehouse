@@ -2,6 +2,7 @@
 # For license information, please see license.txt
 
 import frappe
+from frappe import _
 from frappe.model.document import Document
 
 from service_warehouse.service_warehouse.doctype.tenant.tenant import get_host_user, get_session_tenant
@@ -27,11 +28,18 @@ class ServicePacketVersion(Document):
   def before_insert(self):
     tenant = get_session_tenant()
     if tenant:
+      self._check_duplicate_from_other_owner()
       is_valid_version = self.check_version()
       if not is_valid_version:
         frappe.throw("You are not allowed to add this version. Please check your major or minor values.")
     else:
       frappe.throw("You are not a tenant")
+
+  def _check_duplicate_from_other_owner(self):
+    """Prevent creating a version for a service packet owned by another user."""
+    packet_owner = frappe.db.get_value("Service Packet", self.service_packet, "owner")
+    if packet_owner and packet_owner != frappe.session.user:
+      frappe.throw(_("You cannot duplicate a service packet version that belongs to another user."))
 
   def on_submit(self):
     service_packet = frappe.get_doc("Service Packet", self.service_packet)
