@@ -3,6 +3,12 @@
 
 frappe.listview_settings["Service Packet"] = {
 	onload: function (listview) {
+		// Route the list view through our custom endpoint so that each row
+		// already carries the correct per-tenant `is_subscribed` value and
+		// server-side sorting by that column works correctly.
+		listview.method =
+			"service_warehouse.service_marketplace.doctype.service_packet.service_packet.get_service_packet_list";
+
 		frappe._sw_sp_subscriptions = null;
 
 		const $checkbox = listview.page.add_check(__("Subscribed"));
@@ -20,18 +26,19 @@ frappe.listview_settings["Service Packet"] = {
 			}
 		});
 
+		// Fetch subscription names for the checkbox filter only
+		// (display / sorting is now handled server-side)
 		frappe.call({
 			method: "service_warehouse.service_marketplace.doctype.service_packet.service_packet.get_subscribed_packets",
 			callback: function (r) {
 				frappe._sw_sp_subscriptions = new Set(r.message || []);
-				listview.refresh();
 			},
 		});
 	},
 	formatters: {
-		is_subscribed: function (value, df, doc) {
-			const subscribed =
-				frappe._sw_sp_subscriptions && frappe._sw_sp_subscriptions.has(doc.name);
+		is_subscribed: function (value) {
+			// `value` is now populated by the server ("Yes" / "No")
+			const subscribed = value === "Yes";
 			return `<span class="indicator-pill ${subscribed ? "green" : "gray"}">${
 				subscribed ? __("Yes") : __("No")
 			}</span>`;
