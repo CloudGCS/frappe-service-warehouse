@@ -4,7 +4,11 @@
 frappe.ui.form.on("Service Packet", {
 	refresh: function (frm) {
 		if (!frm.is_new() && frm.doc.owner && frm.doc.owner !== frappe.session.user) {
-			frm.page.remove_menu_item(__("Duplicate"));
+			frm.page.menu
+				.find(".menu-item-label")
+				.filter(function () { return $(this).text().trim() === __("Duplicate"); })
+				.closest("li")
+				.addClass("hide");
 		}
 	},
 	onload: async function (frm) {
@@ -27,6 +31,14 @@ frappe.ui.form.on("Service Packet", {
 		frm.set_df_property("subscribe", "hidden", !isSubscriptionPossible);
 		frm.set_df_property("is_system_packet", "hidden", tenant.name != "HOST");
 		frm.set_value("is_system_packet", tenant.name == "HOST");
+
+		if (!frm.is_new() && frm.doc.owner && frm.doc.owner !== frappe.session.user) {
+			frm.page.menu
+				.find(".menu-item-label")
+				.filter(function () { return $(this).text().trim() === __("Duplicate"); })
+				.closest("li")
+				.addClass("hide");
+		}
 	},
 	before_submit: function (frm) {
 		if (frm.doc.latest_release == null) {

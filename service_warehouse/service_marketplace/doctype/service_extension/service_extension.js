@@ -4,7 +4,11 @@
 frappe.ui.form.on("Service Extension", {
 	refresh(frm) {
 		if (!frm.is_new() && frm.doc.owner && frm.doc.owner !== frappe.session.user) {
-			frm.page.remove_menu_item(__("Duplicate"));
+			frm.page.menu
+				.find(".menu-item-label")
+				.filter(function () { return $(this).text().trim() === __("Duplicate"); })
+				.closest("li")
+				.addClass("hide");
 		}
 	},
 });

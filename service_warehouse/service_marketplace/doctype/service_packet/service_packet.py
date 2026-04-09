@@ -40,15 +40,19 @@ class ServicePacket(Document):
 
 		if not frappe.db.exists("Service Provider", tenant.service_provider):
 			frappe.throw("You are not a valid tenant with well defined service provider.")
+
+		self._check_duplicate_from_other_owner()
+
 		self.service_provider = tenant.service_provider
 
 		if tenant.tenant_code == "HOST":
 			self.is_system_packet = 1
 
-		self._check_duplicate_from_other_owner()
-
 	def _check_duplicate_from_other_owner(self):
-		"""Prevent inserting a packet whose code_name already exists under a different owner."""
+		"""Prevent inserting a packet that belongs to another user.
+		Must be called BEFORE self.service_provider is overwritten.
+		"""
+		# Check 1: code_name is globally unique – if it exists under any owner, block it.
 		existing_owner = frappe.db.get_value(
 			"Service Packet",
 			{"code_name": self.code_name},
@@ -56,6 +60,16 @@ class ServicePacket(Document):
 		)
 		if existing_owner and existing_owner != frappe.session.user:
 			frappe.throw(_("You cannot duplicate a service packet that belongs to another user."))
+
+		# Check 2: exact match on the original service_provider (exact source record lookup).
+		if self.service_provider:
+			existing_owner = frappe.db.get_value(
+				"Service Packet",
+				{"service_provider": self.service_provider, "code_name": self.code_name},
+				"owner",
+			)
+			if existing_owner and existing_owner != frappe.session.user:
+				frappe.throw(_("You cannot duplicate a service packet that belongs to another user."))
 
 	def on_submit(self):
 		if not self.latest_release:
