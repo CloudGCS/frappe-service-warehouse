@@ -7,6 +7,8 @@ from frappe.model.document import Document
 from frappe import _
 
 from service_warehouse.service_warehouse.doctype.tenant.tenant import get_host_user, get_session_tenant
+from frappe.desk.reportview import compress, execute, get_form_params
+
 
 class ServicePacket(Document):
 	# begin: auto-generated types
@@ -89,6 +91,60 @@ class ServicePacket(Document):
 		service_subscription.service_packet = self.name
 		service_subscription.tenant = tenant.name
 		service_subscription.insert(ignore_permissions=True)
+
+
+@frappe.whitelist()
+def get_subscribed_packets():
+	tenant = get_session_tenant()
+	if not tenant:
+		return []
+	return frappe.get_all(
+		"Service Subscription",
+		filters={"tenant": tenant.name},
+		pluck="service_packet"
+	)
+
+
+@frappe.whitelist()
+@frappe.read_only()
+def get_service_packet_list():
+	"""Custom list endpoint that injects per-tenant subscription status and
+	supports sorting by the virtual `is_subscribed` column."""
+
+	args = get_form_params()
+
+	# Detect whether the caller wants to sort by is_subscribed
+	order_by = args.get("order_by") or ""
+	sort_by_subscribed = "is_subscribed" in order_by
+	sort_asc = order_by.lower().rstrip().endswith(" asc")
+
+	# Replace the virtual sort column with a stable default so the DB query succeeds
+	if sort_by_subscribed:
+		args.order_by = "`tabService Packet`.`modified` desc"
+
+	result = execute(**args)
+
+	# Annotate every row with the current tenant's subscription status
+	tenant = get_session_tenant()
+	subscribed: set = set()
+	if tenant:
+		subscribed = set(
+			frappe.get_all(
+				"Service Subscription",
+				filters={"tenant": tenant.name},
+				pluck="service_packet",
+			)
+		)
+
+	for row in result:
+		row["is_subscribed"] = "Yes" if row.get("name") in subscribed else "No"
+
+	# Sort in Python when the caller asked for is_subscribed ordering
+	if sort_by_subscribed:
+		# asc  → No first (N < Y); desc → Yes first (reverse alphabetical)
+		result.sort(key=lambda x: x.get("is_subscribed", "No"), reverse=not sort_asc)
+
+	return compress(result, args)
 
 
 # this method should be called on DocType Service Packet only.
