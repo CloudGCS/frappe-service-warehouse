@@ -7,6 +7,8 @@ from frappe.model.document import Document
 from frappe import _
 
 from service_warehouse.service_warehouse.doctype.tenant.tenant import get_host_user, get_session_tenant
+from frappe.desk.reportview import compress, execute, get_form_params
+
 
 class ServicePacket(Document):
 	# begin: auto-generated types
@@ -67,7 +69,6 @@ class ServicePacket(Document):
 
 @frappe.whitelist()
 def get_subscribed_packets():
-	from service_warehouse.service_warehouse.doctype.tenant.tenant import get_session_tenant
 	tenant = get_session_tenant()
 	if not tenant:
 		return []
@@ -83,7 +84,6 @@ def get_subscribed_packets():
 def get_service_packet_list():
 	"""Custom list endpoint that injects per-tenant subscription status and
 	supports sorting by the virtual `is_subscribed` column."""
-	from frappe.desk.reportview import compress, execute, get_form_params
 
 	args = get_form_params()
 
