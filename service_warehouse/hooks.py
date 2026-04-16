@@ -7,6 +7,7 @@ app_license = "mit"
 # required_apps = []
 
 
+
 fixtures = [
   {"dt": "Service Extension Type", "filters": [["name", "in", ["PS Plugin", "MC Plugin", "Web Application", "Service Container"]]]},
   {"dt": "User", "filters": [["username", "in", ["host"]]]},
