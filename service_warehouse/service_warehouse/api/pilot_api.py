@@ -23,6 +23,7 @@ def create_pilot_profile_if_pilot(doc, method=None):
     profile.pilot_id = pilot_id
     profile.user = doc.name
     profile.status = "Active"
+    profile.owner = doc.name
     profile.insert(ignore_permissions=True)
     frappe.db.commit()
 

@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"mpp_header_1\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>My Pilot Profile</b></span>\",\"col\":12}},{\"id\":\"mpp_qlist_1\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"My Flight Logs\",\"col\":12}}]",
+ "content": "[{\"id\":\"mpp_header_1\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>My Pilot Profile</b></span>\",\"col\":12}},{\"id\":\"mpp_shortcut_1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"My Profile\",\"col\":12}},{\"id\":\"mpp_qlist_1\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"My Flight Logs\",\"col\":12}}]",
  "creation": "2026-04-19 00:00:00.000000",
  "custom_blocks": [],
  "docstatus": 0,
@@ -34,6 +34,16 @@
   }
  ],
  "sequence_id": 11.0,
- "shortcuts": [],
+ "shortcuts": [
+  {
+   "color": "Blue",
+   "doc_view": "",
+   "format": "",
+   "icon": "user",
+   "label": "My Profile",
+   "link_to": "Pilot Profile",
+   "type": "DocType"
+  }
+ ],
  "title": "My Pilot Profile"
 }
