@@ -145,7 +145,10 @@ doc_events = {
     "File": {
         "before_insert": "service_warehouse.overrides.file_override.validate_file",
         "after_insert": "service_warehouse.overrides.file_override.on_update_file",
-    }
+    },
+    "User": {
+        "after_insert": "service_warehouse.service_warehouse.api.pilot_api.create_pilot_profile_if_pilot",
+    },
 }
 
 # Scheduled Tasks
