@@ -107,7 +107,6 @@
   },
   {
    "email": 1,
-   "if_owner": 1,
    "print": 1,
    "read": 1,
    "role": "Pilot Role",
