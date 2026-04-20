@@ -183,6 +183,7 @@ doc_events = {
 override_whitelisted_methods = {
     "get_user_boxes": "service_warehouse.service_warehouse.controller.server_box_controller.get_user_boxes",
     "update_server_box_info_data": "service_warehouse.service_warehouse.controller.server_box_controller.update_server_box_info_data",
+    "get_pilot_by_pilot_id": "service_warehouse.service_warehouse.api.pilot_api.get_pilot_by_pilot_id",
 }
 #
 # each overriding function accepts a `data` argument;
