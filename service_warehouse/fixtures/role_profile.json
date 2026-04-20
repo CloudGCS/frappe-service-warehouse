@@ -1,0 +1,13 @@
+[
+  {
+    "doctype": "Role Profile",
+    "name": "Pilot",
+    "role_profile": "Pilot",
+    "roles": [
+      {
+        "doctype": "Has Role",
+        "role": "Pilot Role"
+      }
+    ]
+  }
+]

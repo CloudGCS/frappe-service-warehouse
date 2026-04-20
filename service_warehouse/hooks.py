@@ -18,7 +18,8 @@ fixtures = [
                                           ["extension_code", "not like", "%Test%"],
                                           ["extension_code", "not like", "%TEST%"]
                                         ]},
-  {"dt": "Role", "filters": [["name", "in", ["Host"]]]},
+  {"dt": "Role", "filters": [["name", "in", ["Host", "Pilot Role"]]]},
+  {"dt": "Role Profile", "filters": [["name", "in", ["Pilot"]]]},
   {"doctype": "Custom HTML Block"},
 
 ]
@@ -123,6 +124,7 @@ fixtures = [
 permission_query_conditions = {
 	"Service Packet": "service_warehouse.permissions.filter_service_packets",
   "Service Subscription": "service_warehouse.permissions.filter_service_subscriptions",
+  "Pilot Profile": "service_warehouse.service_warehouse.controller.pilot_controller.get_pilot_profile_permission_query",
 }
 #
 # has_permission = {
@@ -147,7 +149,7 @@ doc_events = {
         "after_insert": "service_warehouse.overrides.file_override.on_update_file",
     },
     "User": {
-        "after_insert": "service_warehouse.service_warehouse.api.pilot_api.create_pilot_profile_if_pilot",
+        "after_insert": "service_warehouse.service_warehouse.controller.pilot_controller.create_pilot_profile_if_pilot",
     },
 }
 
@@ -183,7 +185,7 @@ doc_events = {
 override_whitelisted_methods = {
     "get_user_boxes": "service_warehouse.service_warehouse.controller.server_box_controller.get_user_boxes",
     "update_server_box_info_data": "service_warehouse.service_warehouse.controller.server_box_controller.update_server_box_info_data",
-    "get_pilot_by_pilot_id": "service_warehouse.service_warehouse.api.pilot_api.get_pilot_by_pilot_id",
+    "get_pilot_by_pilot_id": "service_warehouse.service_warehouse.controller.pilot_controller.get_pilot_by_pilot_id",
 }
 #
 # each overriding function accepts a `data` argument;

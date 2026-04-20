@@ -5,6 +5,29 @@ from service_warehouse.utils.api_utils import APIResponse
 PILOT_ROLE = "Pilot Role"
 
 
+def get_pilot_profile_permission_query(user=None):
+    """
+    - System Manager / Host: all profiles
+    - Tenant: all active profiles (Available Pilots)
+    - Pilot Role: only own profile
+    """
+    if not user:
+        user = frappe.session.user
+
+    roles = frappe.get_roles(user)
+
+    if "System Manager" in roles or "Host" in roles:
+        return ""
+
+    if "Tenant" in roles:
+        return "`tabPilot Profile`.`status` = 'Active'"
+
+    if PILOT_ROLE in roles:
+        return f"`tabPilot Profile`.`user` = {frappe.db.escape(user)}"
+
+    return "1=0"
+
+
 def create_pilot_profile_if_pilot(doc, method=None):
     """
     When a User is created, if they have the Pilot Role,
