@@ -79,14 +79,23 @@ def get_available_pilots():
 
 
 @frappe.whitelist()
-def get_pilot_by_pilot_id(pilot_id: str):
-    """Returns pilot information by PilotID. Called from the Tenant Box."""
-    if not pilot_id:
-        return APIResponse.failed(message="pilot_id is required", status_code=400)
+def get_pilot_by_pilot_id(pilot_id: str = None, pilot_email: str = None):
+    """Returns pilot information by PilotID or email. Called from Tenant/Service Boxes."""
+    if not pilot_id and not pilot_email:
+        return APIResponse.failed(message="pilot_id or pilot_email is required", status_code=400)
+
+    if pilot_id:
+        filters = {"pilot_id": pilot_id}
+    else:
+        # Lookup by the User linked to this Pilot Profile
+        user_name = frappe.db.get_value("User", {"email": pilot_email}, "name")
+        if not user_name:
+            return APIResponse.failed(message="Pilot not found", status_code=404)
+        filters = {"user": user_name}
 
     profile = frappe.db.get_value(
         "Pilot Profile",
-        {"pilot_id": pilot_id},
+        filters,
         ["pilot_id", "full_name", "email", "phone", "name", "status"],
         as_dict=True,
     )
@@ -137,3 +146,56 @@ def upsert_pilot_flight_log(**kwargs):
     log.save(ignore_permissions=True)
     frappe.db.commit()
     return APIResponse.success()
+
+
+def get_pilot_flight_log_permission_query(user=None):
+    """
+    - System Manager / Host: all logs
+    - Pilot Role: only logs belonging to their own Pilot Profile
+    """
+    if not user:
+        user = frappe.session.user
+
+    roles = frappe.get_roles(user)
+
+    if "System Manager" in roles or "Host" in roles:
+        return ""
+
+    if PILOT_ROLE in roles:
+        profile_name = frappe.db.get_value("Pilot Profile", {"user": user}, "name")
+        if not profile_name:
+            return "1=0"
+        return f"`tabPilot Flight Log`.`pilot` = {frappe.db.escape(profile_name)}"
+
+    return "1=0"
+
+
+@frappe.whitelist(allow_guest=True)
+def register_pilot(full_name: str, email: str, password: str):
+    """Self-registration endpoint for pilots. Creates a User with Pilot Role."""
+    if not full_name or not email or not password:
+        return APIResponse.failed(message="All fields are required", status_code=400)
+
+    if frappe.db.exists("User", email):
+        return APIResponse.failed(message="A user with this email already exists", status_code=409)
+
+    if len(password) < 8:
+        return APIResponse.failed(message="Password must be at least 8 characters", status_code=400)
+
+    try:
+        user = frappe.new_doc("User")
+        user.email = email
+        user.first_name = full_name
+        user.send_welcome_email = 0
+        user.role_profile_name = "Pilot"
+        user.module_profile = "Pilot"
+        user.insert(ignore_permissions=True)
+
+        from frappe.utils.password import update_password
+        update_password(user.email, password)
+
+        frappe.db.commit()
+        return APIResponse.success(message="Registration successful. You can now log in.")
+    except Exception as e:
+        frappe.log_error(str(e), "Pilot Registration")
+        return APIResponse.failed(message="Registration failed. Please try again.", status_code=500)

@@ -1,0 +1,89 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Pilot Registration{% endblock %}
+
+{% block page_content %}
+<div class="container" style="max-width: 480px; margin: 60px auto;">
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <h3 class="mb-4 text-center">Pilot Registration</h3>
+
+            <div id="register-error" class="alert alert-danger d-none"></div>
+            <div id="register-success" class="alert alert-success d-none"></div>
+
+            <form id="pilot-register-form">
+                <div class="form-group mb-3">
+                    <label for="full_name">Full Name</label>
+                    <input type="text" id="full_name" class="form-control" placeholder="Enter your full name" required />
+                </div>
+                <div class="form-group mb-3">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" class="form-control" placeholder="Enter your email" required />
+                </div>
+                <div class="form-group mb-3">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="Minimum 8 characters" required />
+                </div>
+                <div class="form-group mb-4">
+                    <label>Role</label>
+                    <input type="text" class="form-control" value="Pilot" disabled />
+                </div>
+                <button type="submit" id="register-btn" class="btn btn-primary w-100">Register</button>
+            </form>
+
+            <div class="text-center mt-3">
+                <a href="/login">Already have an account? Log in</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById("pilot-register-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    var btn = document.getElementById("register-btn");
+    var errorDiv = document.getElementById("register-error");
+    var successDiv = document.getElementById("register-success");
+
+    errorDiv.classList.add("d-none");
+    successDiv.classList.add("d-none");
+    btn.disabled = true;
+    btn.textContent = "Registering...";
+
+    var full_name = document.getElementById("full_name").value.trim();
+    var email = document.getElementById("email").value.trim();
+    var password = document.getElementById("password").value;
+
+    fetch("/api/method/register_pilot", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-Frappe-CSRF-Token": "fetch"
+        },
+        body: JSON.stringify({ full_name: full_name, email: email, password: password })
+    })
+    .then(function (res) { return res.json(); })
+    .then(function (data) {
+        btn.disabled = false;
+        btn.textContent = "Register";
+        var result = data.message;
+        if (result && result.status === "success") {
+            successDiv.textContent = result.message + " Redirecting to login...";
+            successDiv.classList.remove("d-none");
+            document.getElementById("pilot-register-form").reset();
+            setTimeout(function () { window.location.href = "/login"; }, 2000);
+        } else {
+            errorDiv.textContent = (result && result.message) || "Registration failed.";
+            errorDiv.classList.remove("d-none");
+        }
+    })
+    .catch(function () {
+        btn.disabled = false;
+        btn.textContent = "Register";
+        errorDiv.textContent = "Network error. Please try again.";
+        errorDiv.classList.remove("d-none");
+    });
+});
+</script>
+{% endblock %}

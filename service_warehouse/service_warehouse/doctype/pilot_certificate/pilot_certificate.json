@@ -39,7 +39,15 @@
  "module": "Service Warehouse",
  "name": "Pilot Certificate",
  "owner": "Administrator",
- "permissions": [],
+ "permissions": [
+  {
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "role": "Pilot Role"
+  }
+ ],
  "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",

@@ -1,0 +1,25 @@
+[
+ {
+  "doctype": "Module Profile",
+  "module_profile_name": "Pilot",
+  "name": "Pilot",
+  "block_modules": [
+   {
+    "doctype": "Block Module",
+    "module": "Core"
+   },
+   {
+    "doctype": "Block Module",
+    "module": "Automation"
+   },
+   {
+    "doctype": "Block Module",
+    "module": "Website"
+   },
+   {
+    "doctype": "Block Module",
+    "module": "Integrations"
+   }
+  ]
+ }
+]

@@ -20,6 +20,7 @@ fixtures = [
                                         ]},
   {"dt": "Role", "filters": [["name", "in", ["Host", "Pilot Role"]]]},
   {"dt": "Role Profile", "filters": [["name", "in", ["Pilot"]]]},
+  {"dt": "Module Profile", "filters": [["name", "in", ["Pilot"]]]},
   {"doctype": "Custom HTML Block"},
 
 ]
@@ -30,7 +31,7 @@ fixtures = [
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/service_warehouse/css/service_warehouse.css"
-# app_include_js = "/assets/service_warehouse/js/service_warehouse.js"
+app_include_js = "/assets/service_warehouse/js/workspace_filter.js"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/service_warehouse/css/service_warehouse.css"
@@ -125,6 +126,7 @@ permission_query_conditions = {
 	"Service Packet": "service_warehouse.permissions.filter_service_packets",
   "Service Subscription": "service_warehouse.permissions.filter_service_subscriptions",
   "Pilot Profile": "service_warehouse.service_warehouse.controller.pilot_controller.get_pilot_profile_permission_query",
+  "Pilot Flight Log": "service_warehouse.service_warehouse.controller.pilot_controller.get_pilot_flight_log_permission_query",
 }
 #
 # has_permission = {
@@ -186,6 +188,7 @@ override_whitelisted_methods = {
     "get_user_boxes": "service_warehouse.service_warehouse.controller.server_box_controller.get_user_boxes",
     "update_server_box_info_data": "service_warehouse.service_warehouse.controller.server_box_controller.update_server_box_info_data",
     "get_pilot_by_pilot_id": "service_warehouse.service_warehouse.controller.pilot_controller.get_pilot_by_pilot_id",
+    "register_pilot": "service_warehouse.service_warehouse.controller.pilot_controller.register_pilot",
 }
 #
 # each overriding function accepts a `data` argument;

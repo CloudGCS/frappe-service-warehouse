@@ -1,7 +1,7 @@
 {
  "charts": [],
  "content": "[{\"id\":\"mpp_header_1\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>My Pilot Profile</b></span>\",\"col\":12}},{\"id\":\"mpp_shortcut_1\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"My Profile\",\"col\":12}},{\"id\":\"mpp_qlist_1\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"My Flight Logs\",\"col\":12}}]",
- "creation": "2026-04-19 00:00:00.000000",
+ "creation": "2026-04-19 00:00:00",
  "custom_blocks": [],
  "docstatus": 0,
  "doctype": "Workspace",
@@ -13,7 +13,7 @@
  "is_hidden": 0,
  "label": "My Pilot Profile",
  "links": [],
- "modified": "2026-04-19 00:00:00.000000",
+ "modified": "2026-04-23 18:06:26.301573",
  "modified_by": "Administrator",
  "module": "Service Warehouse",
  "name": "My Pilot Profile",
@@ -26,9 +26,17 @@
    "document_type": "Pilot Flight Log",
    "label": "My Flight Logs",
    "quick_list_filter": "[]"
+  },
+  {
+   "document_type": "Pilot Flight Log",
+   "label": "My Flight Logs",
+   "quick_list_filter": "[]"
   }
  ],
  "roles": [
+  {
+   "role": "Pilot Role"
+  },
   {
    "role": "Pilot Role"
   }

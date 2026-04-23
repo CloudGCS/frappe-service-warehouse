@@ -17,7 +17,7 @@
  "is_hidden": 0,
  "label": "Service Boxes",
  "links": [],
- "modified": "2025-11-19 17:06:15.923154",
+ "modified": "2026-04-23 13:05:46.190116",
  "modified_by": "Administrator",
  "module": "Service Warehouse",
  "name": "Service Boxes",
@@ -26,7 +26,17 @@
  "parent_page": "Dashboard-Tenant",
  "public": 1,
  "quick_lists": [],
- "roles": [],
+ "roles": [
+  {
+   "role": "Tenant"
+  },
+  {
+   "role": "Host"
+  },
+  {
+   "role": "System Manager"
+  }
+ ],
  "sequence_id": 2.0,
  "shortcuts": [],
  "title": "Service Boxes"

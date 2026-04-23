@@ -12,6 +12,7 @@
   "email",
   "phone",
   "status",
+  "total_flight_hours",
   "certificates"
  ],
  "fields": [
@@ -56,6 +57,12 @@
    "fieldtype": "Select",
    "label": "Status",
    "options": "Active\nInactive\nPending"
+  },
+  {
+   "fieldname": "total_flight_hours",
+   "fieldtype": "Float",
+   "label": "Total Flight Hours",
+   "read_only": 1
   },
   {
    "fieldname": "certificates",
