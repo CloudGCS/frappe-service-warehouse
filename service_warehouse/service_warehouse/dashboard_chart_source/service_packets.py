@@ -308,6 +308,7 @@ def get_server_boxes_info(filter):
             "name": sb.name,
             "tenant": sb.tenant,
             "box_name": getattr(sb, "box_name", sb.name),
+            "box_type": getattr(sb, "box_type", ""),
             "server_box_version": sb.server_box_version,
             "miss_update": miss_update,
             "lack_update": lack_update,

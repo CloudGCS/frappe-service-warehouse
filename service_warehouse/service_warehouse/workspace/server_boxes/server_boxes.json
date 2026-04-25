@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"PpZn5KiqcR\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Service Boxes</span>\",\"col\":12}},{\"id\":\"LcgMF2YbJ0\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Tenant Outdated Server Box List\",\"col\":12}}]",
+ "content": "[{\"id\":\"PpZn5KiqcR\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Server Boxes</span>\",\"col\":12}},{\"id\":\"LcgMF2YbJ0\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Tenant Outdated Server Box List\",\"col\":12}}]",
  "creation": "2025-10-31 10:08:22.487484",
  "custom_blocks": [
   {
@@ -12,15 +12,16 @@
  "doctype": "Workspace",
  "for_user": "",
  "hide_custom": 0,
+ "icon": "",
  "idx": 0,
- "indicator_color": "green",
+ "indicator_color": "",
  "is_hidden": 0,
- "label": "Service Boxes",
+ "label": "Server Boxes",
  "links": [],
- "modified": "2025-11-19 17:06:15.923154",
+ "modified": "2026-04-25 21:25:54.200613",
  "modified_by": "Administrator",
  "module": "Service Warehouse",
- "name": "Service Boxes",
+ "name": "Server Boxes",
  "number_cards": [],
  "owner": "Administrator",
  "parent_page": "Dashboard-Tenant",
@@ -29,5 +30,5 @@
  "roles": [],
  "sequence_id": 2.0,
  "shortcuts": [],
- "title": "Service Boxes"
+ "title": "Server Boxes"
 }
