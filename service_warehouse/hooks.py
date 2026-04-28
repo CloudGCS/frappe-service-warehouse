@@ -190,6 +190,7 @@ override_whitelisted_methods = {
     "update_server_box_info_data": "service_warehouse.service_warehouse.controller.server_box_controller.update_server_box_info_data",
     "get_pilot_by_pilot_id": "service_warehouse.service_warehouse.controller.pilot_controller.get_pilot_by_pilot_id",
     "register_pilot": "service_warehouse.service_warehouse.controller.pilot_controller.register_pilot",
+    "upsert_pilot_flight_log": "service_warehouse.service_warehouse.controller.pilot_controller.upsert_pilot_flight_log",
 }
 #
 # each overriding function accepts a `data` argument;
