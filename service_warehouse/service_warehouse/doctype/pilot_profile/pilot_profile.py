@@ -31,3 +31,10 @@ class PilotProfile(Document):
                 ) or 0
                 self.set_onload("total_flight_hours", total)
                 self.total_flight_hours = total
+
+        def on_update(self):
+                """Sync phone to User.mobile_no when Pilot Profile is saved."""
+                if self.user and self.phone is not None:
+                        current = frappe.db.get_value("User", self.user, "mobile_no")
+                        if current != self.phone:
+                                frappe.db.set_value("User", self.user, "mobile_no", self.phone)

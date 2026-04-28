@@ -28,6 +28,16 @@ def get_pilot_profile_permission_query(user=None):
     return "1=0"
 
 
+def sync_pilot_profile_phone_from_user(doc, method=None):
+    """Sync User.mobile_no to Pilot Profile.phone when User is updated."""
+    profile_name = frappe.db.get_value("Pilot Profile", {"user": doc.name}, "name")
+    if not profile_name:
+        return
+    current_phone = frappe.db.get_value("Pilot Profile", profile_name, "phone")
+    if current_phone != (doc.mobile_no or ""):
+        frappe.db.set_value("Pilot Profile", profile_name, "phone", doc.mobile_no or "")
+
+
 def create_pilot_profile_if_pilot(doc, method=None):
     """
     When a User is created, if they have the Pilot Role,
@@ -46,6 +56,7 @@ def create_pilot_profile_if_pilot(doc, method=None):
     profile.pilot_id = pilot_id
     profile.user = doc.name
     profile.status = "Active"
+    profile.phone = doc.mobile_no or ""
     profile.owner = doc.name
     profile.insert(ignore_permissions=True)
     frappe.db.commit()
@@ -171,7 +182,7 @@ def get_pilot_flight_log_permission_query(user=None):
 
 
 @frappe.whitelist(allow_guest=True)
-def register_pilot(full_name: str, email: str, password: str):
+def register_pilot(full_name: str, email: str, password: str, phone: str = None):
     """Self-registration endpoint for pilots. Creates a User with Pilot Role."""
     if not full_name or not email or not password:
         return APIResponse.failed(message="All fields are required", status_code=400)
@@ -186,6 +197,7 @@ def register_pilot(full_name: str, email: str, password: str):
         user = frappe.new_doc("User")
         user.email = email
         user.first_name = full_name
+        user.mobile_no = phone or ""
         user.send_welcome_email = 0
         user.role_profile_name = "Pilot"
         user.module_profile = "Pilot"

@@ -152,6 +152,7 @@ doc_events = {
     },
     "User": {
         "after_insert": "service_warehouse.service_warehouse.controller.pilot_controller.create_pilot_profile_if_pilot",
+        "on_update": "service_warehouse.service_warehouse.controller.pilot_controller.sync_pilot_profile_phone_from_user",
     },
 }
 

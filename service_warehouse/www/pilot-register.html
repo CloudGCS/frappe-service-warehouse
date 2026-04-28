@@ -24,6 +24,10 @@
                     <label for="password">Password</label>
                     <input type="password" id="password" class="form-control" placeholder="Minimum 8 characters" required />
                 </div>
+                <div class="form-group mb-3">
+                    <label for="phone">Phone Number <span class="text-muted">(optional)</span></label>
+                    <input type="tel" id="phone" class="form-control" placeholder="Enter your phone number" />
+                </div>
                 <div class="form-group mb-4">
                     <label>Role</label>
                     <input type="text" class="form-control" value="Pilot" disabled />
@@ -54,6 +58,7 @@ document.getElementById("pilot-register-form").addEventListener("submit", functi
     var full_name = document.getElementById("full_name").value.trim();
     var email = document.getElementById("email").value.trim();
     var password = document.getElementById("password").value;
+    var phone = document.getElementById("phone").value.trim();
 
     fetch("/api/method/register_pilot", {
         method: "POST",
@@ -61,7 +66,7 @@ document.getElementById("pilot-register-form").addEventListener("submit", functi
             "Content-Type": "application/json",
             "X-Frappe-CSRF-Token": "fetch"
         },
-        body: JSON.stringify({ full_name: full_name, email: email, password: password })
+        body: JSON.stringify({ full_name: full_name, email: email, password: password, phone: phone || null })
     })
     .then(function (res) { return res.json(); })
     .then(function (data) {
