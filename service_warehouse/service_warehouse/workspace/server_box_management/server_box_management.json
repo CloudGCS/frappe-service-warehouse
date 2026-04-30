@@ -1,11 +1,11 @@
 {
  "charts": [
   {
-   "chart_name": "Total Service Box Count",
-   "label": "Total Service Box Count"
+   "chart_name": "Total Server Box Count",
+   "label": "Total Server Box Count"
   }
  ],
- "content": "[{\"id\":\"0i4lzaKvxd\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Total Service Box Count\",\"col\":12}},{\"id\":\"HCn86U2stf\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Server Box Version List\",\"col\":4}},{\"id\":\"pucPoYV5t2\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Server Box List\",\"col\":4}},{\"id\":\"fmFic03v83\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Outdated Server Box List\",\"col\":12}}]",
+ "content": "[{\"id\":\"0i4lzaKvxd\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Total Server Box Count\",\"col\":12}},{\"id\":\"HCn86U2stf\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Server Box Version List\",\"col\":4}},{\"id\":\"pucPoYV5t2\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Server Box List\",\"col\":4}},{\"id\":\"fmFic03v83\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Outdated Server Box List\",\"col\":12}}]",
  "creation": "2025-10-31 10:03:40.535129",
  "custom_blocks": [
   {
@@ -21,12 +21,12 @@
  "idx": 0,
  "indicator_color": "",
  "is_hidden": 0,
- "label": "Service Box Management",
+ "label": "Server Box Management",
  "links": [],
- "modified": "2025-12-04 07:17:31.343703",
+ "modified": "2025-12-04 07:17:31.343730",
  "modified_by": "Administrator",
  "module": "Service Warehouse",
- "name": "Service Box Management",
+ "name": "Server Box Management",
  "number_cards": [],
  "owner": "Administrator",
  "parent_page": "Dashboard-Host",
@@ -50,5 +50,5 @@
  ],
  "sequence_id": 7.0,
  "shortcuts": [],
- "title": "Service Box Management"
+ "title": "Server Box Management"
 }
