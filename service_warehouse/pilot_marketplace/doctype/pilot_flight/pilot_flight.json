@@ -1,0 +1,116 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:source_flight_id",
+ "creation": "2026-04-19 14:01:51.429548",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "pilot",
+  "tenant",
+  "tenant_name",
+  "aircraft_name",
+  "flight_hours",
+  "flight_date",
+  "source_flight_id",
+  "location"
+ ],
+ "fields": [
+  {
+   "fieldname": "pilot",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Pilot",
+   "options": "Pilot Profile",
+   "reqd": 1
+  },
+  {
+   "fieldname": "tenant",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Tenant",
+   "options": "Tenant",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "tenant.tenant_name",
+   "fieldname": "tenant_name",
+   "fieldtype": "Data",
+   "label": "Tenant Name",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "aircraft_name",
+   "fieldtype": "Data",
+   "label": "Aircraft Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "flight_hours",
+   "fieldtype": "Duration",
+   "label": "Flight Hours",
+   "precision": "2",
+   "reqd": 1
+  },
+  {
+   "fieldname": "flight_date",
+   "fieldtype": "Date",
+   "label": "Flight Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "source_flight_id",
+   "fieldtype": "Data",
+   "label": "Flight Id",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "default": "    {\n      \"type\": \"Feature\",\n      \"properties\": {},\n      \"geometry\": {\n        \"coordinates\": [\n          10.598098374420147,\n          10.601804617749053\n        ],\n        \"type\": \"Point\"\n      }\n    }",
+   "fieldname": "location",
+   "fieldtype": "Geolocation",
+   "label": "Location",
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-04-30 10:02:38.927326",
+ "modified_by": "Administrator",
+ "module": "Pilot Marketplace",
+ "name": "Pilot Flight",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Pilot Role"
+  },
+  {
+   "export": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Host"
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

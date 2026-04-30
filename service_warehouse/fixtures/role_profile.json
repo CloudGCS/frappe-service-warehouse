@@ -1,13 +1,17 @@
 [
-  {
-    "doctype": "Role Profile",
-    "name": "Pilot",
-    "role_profile": "Pilot",
-    "roles": [
-      {
-        "doctype": "Has Role",
-        "role": "Pilot Role"
-      }
-    ]
-  }
+ {
+  "docstatus": 0,
+  "doctype": "Role Profile",
+  "modified": "2026-04-29 17:32:02.807568",
+  "name": "Pilot",
+  "role_profile": "Pilot",
+  "roles": [
+   {
+    "parent": "Pilot",
+    "parentfield": "roles",
+    "parenttype": "Role Profile",
+    "role": "Pilot Role"
+   }
+  ]
+ }
 ]

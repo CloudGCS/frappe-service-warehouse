@@ -1,0 +1,139 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:pilot_id",
+ "creation": "2026-04-19 13:26:06.260596",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "pilot_id",
+  "user",
+  "full_name",
+  "email",
+  "time_zone",
+  "status",
+  "total_flight_hours",
+  "flight_experiences",
+  "certificates",
+  "phone"
+ ],
+ "fields": [
+  {
+   "fieldname": "pilot_id",
+   "fieldtype": "Data",
+   "label": "Pilot ID",
+   "read_only": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "User",
+   "options": "User",
+   "reqd": 1,
+   "set_only_once": 1
+  },
+  {
+   "fetch_from": "user.full_name",
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "label": "Full Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "user.email",
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email",
+   "read_only": 1
+  },
+  {
+   "fieldname": "time_zone",
+   "fieldtype": "Autocomplete",
+   "label": "Time Zone"
+  },
+  {
+   "default": "Pending",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Active\nInactive\nPending"
+  },
+  {
+   "fieldname": "total_flight_hours",
+   "fieldtype": "Float",
+   "label": "Total Flight Hours",
+   "read_only": 1
+  },
+  {
+   "fieldname": "flight_experiences",
+   "fieldtype": "Table",
+   "label": "Flight Experiences",
+   "options": "Pilot Flight Experience"
+  },
+  {
+   "fieldname": "certificates",
+   "fieldtype": "Table",
+   "label": "Certificates",
+   "options": "Pilot Certificate"
+  },
+  {
+   "fieldname": "phone",
+   "fieldtype": "Data",
+   "label": "Phone"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-04-30 08:05:09.059467",
+ "modified_by": "Administrator",
+ "module": "Pilot Marketplace",
+ "name": "Pilot Profile",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Tenant",
+   "share": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Host",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "Pilot Role"
+  },
+  {
+   "if_owner": 1,
+   "role": "Pilot Role",
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

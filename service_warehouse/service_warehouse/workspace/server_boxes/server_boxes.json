@@ -33,9 +33,6 @@
   },
   {
    "role": "Host"
-  },
-  {
-   "role": "System Manager"
   }
  ],
  "sequence_id": 2.0,

@@ -13,11 +13,6 @@ fixtures = [
   {"dt": "User", "filters": [["username", "in", ["host"]]]},
   {"dt": "Service Provider", "filters": [["name", "in", ["SYSTEM"]]]},
   {"dt": "Tenant", "filters": [["name", "in", ["HOST"]]]},
-  {"dt": "Service Extension", "filters": [
-                                          ["service_provider", "in", ["SYSTEM"]],
-                                          ["extension_code", "not like", "%Test%"],
-                                          ["extension_code", "not like", "%TEST%"]
-                                        ]},
   {"dt": "Role", "filters": [["name", "in", ["Host", "Pilot Role"]]]},
   {"dt": "Role Profile", "filters": [["name", "in", ["Pilot"]]]},
   {"dt": "Module Profile", "filters": [["name", "in", ["Pilot"]]]},
@@ -123,15 +118,14 @@ app_include_js = "/assets/service_warehouse/js/workspace_filter.js"
 # Permissions evaluated in scripted ways
 
 permission_query_conditions = {
-	"Service Packet": "service_warehouse.permissions.filter_service_packets",
+  "Service Packet": "service_warehouse.permissions.filter_service_packets",
   "Service Subscription": "service_warehouse.permissions.filter_service_subscriptions",
   "Pilot Profile": "service_warehouse.service_warehouse.controller.pilot_controller.get_pilot_profile_permission_query",
-  "Pilot Flight Log": "service_warehouse.service_warehouse.controller.pilot_controller.get_pilot_flight_log_permission_query",
+  "Pilot Flight": "service_warehouse.service_warehouse.controller.pilot_controller.get_pilot_flight_permission_query",
 }
-#
-# has_permission = {
-# 	"Event": "frappe.desk.doctype.event.event.has_permission",
-# }
+has_permission = {
+    "Pilot Profile": "service_warehouse.pilot_marketplace.doctype.pilot_profile.pilot_profile.has_permission",
+}
 
 # DocType Class
 # ---------------
@@ -151,8 +145,9 @@ doc_events = {
         "after_insert": "service_warehouse.overrides.file_override.on_update_file",
     },
     "User": {
+        "validate": "service_warehouse.utils.user_validation.user_validation",
         "after_insert": "service_warehouse.service_warehouse.controller.pilot_controller.create_pilot_profile_if_pilot",
-        "on_update": "service_warehouse.service_warehouse.controller.pilot_controller.sync_pilot_profile_phone_from_user",
+        "on_update": "service_warehouse.service_warehouse.controller.pilot_controller.sync_pilot_profile_from_user",
     },
 }
 
@@ -190,7 +185,7 @@ override_whitelisted_methods = {
     "update_server_box_info_data": "service_warehouse.service_warehouse.controller.server_box_controller.update_server_box_info_data",
     "get_pilot_by_pilot_id": "service_warehouse.service_warehouse.controller.pilot_controller.get_pilot_by_pilot_id",
     "register_pilot": "service_warehouse.service_warehouse.controller.pilot_controller.register_pilot",
-    "upsert_pilot_flight_log": "service_warehouse.service_warehouse.controller.pilot_controller.upsert_pilot_flight_log",
+    "upsert_pilot_flight": "service_warehouse.service_warehouse.controller.pilot_controller.upsert_pilot_flight",
 }
 #
 # each overriding function accepts a `data` argument;

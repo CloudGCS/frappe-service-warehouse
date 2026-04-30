@@ -1,15 +1,32 @@
 import frappe
 import uuid
+from frappe.utils import get_system_timezone
 from service_warehouse.utils.api_utils import APIResponse
 
 PILOT_ROLE = "Pilot Role"
+
+
+def _normalize_phone(value):
+    if not isinstance(value, str):
+        return value
+
+    value = value.strip()
+    return value or None
+
+
+def _normalize_time_zone(value):
+    if not isinstance(value, str):
+        return value
+
+    value = value.strip()
+    return value or None
 
 
 def get_pilot_profile_permission_query(user=None):
     """
     - System Manager / Host: all profiles
     - Tenant: all active profiles (Available Pilots)
-    - Pilot Role: only own profile
+    - Pilot Role: all profiles, but edit is still restricted by has_permission
     """
     if not user:
         user = frappe.session.user
@@ -23,19 +40,31 @@ def get_pilot_profile_permission_query(user=None):
         return "`tabPilot Profile`.`status` = 'Active'"
 
     if PILOT_ROLE in roles:
-        return f"`tabPilot Profile`.`user` = {frappe.db.escape(user)}"
+        return ""
 
     return "1=0"
 
 
-def sync_pilot_profile_phone_from_user(doc, method=None):
-    """Sync User.mobile_no to Pilot Profile.phone when User is updated."""
+def sync_pilot_profile_from_user(doc, method=None):
+    """Sync User fields to Pilot Profile when User is updated."""
     profile_name = frappe.db.get_value("Pilot Profile", {"user": doc.name}, "name")
     if not profile_name:
         return
-    current_phone = frappe.db.get_value("Pilot Profile", profile_name, "phone")
-    if current_phone != (doc.mobile_no or ""):
-        frappe.db.set_value("Pilot Profile", profile_name, "phone", doc.mobile_no or "")
+
+    normalized_phone = _normalize_phone(doc.phone)
+    normalized_time_zone = _normalize_time_zone(doc.time_zone)
+    current_values = frappe.db.get_value(
+        "Pilot Profile", profile_name, ["phone", "time_zone"], as_dict=True
+    )
+
+    updates = {}
+    if current_values.phone != normalized_phone:
+        updates["phone"] = normalized_phone
+    if current_values.time_zone != normalized_time_zone:
+        updates["time_zone"] = normalized_time_zone
+
+    if updates:
+        frappe.db.set_value("Pilot Profile", profile_name, updates, update_modified=False)
 
 
 def create_pilot_profile_if_pilot(doc, method=None):
@@ -56,7 +85,8 @@ def create_pilot_profile_if_pilot(doc, method=None):
     profile.pilot_id = pilot_id
     profile.user = doc.name
     profile.status = "Active"
-    profile.phone = doc.mobile_no or ""
+    profile.phone = _normalize_phone(doc.phone)
+    profile.time_zone = _normalize_time_zone(doc.time_zone)
     profile.owner = doc.name
     profile.insert(ignore_permissions=True)
     frappe.db.commit()
@@ -77,7 +107,7 @@ def get_available_pilots():
     profiles = frappe.get_all(
         "Pilot Profile",
         filters={"status": "Active"},
-        fields=["pilot_id", "full_name", "email", "phone", "user", "name"],
+        fields=["pilot_id", "full_name", "email", "phone", "time_zone", "user", "name"],
     )
     for profile in profiles:
         certs = frappe.get_all(
@@ -107,7 +137,7 @@ def get_pilot_by_pilot_id(pilot_id: str = None, pilot_email: str = None):
     profile = frappe.db.get_value(
         "Pilot Profile",
         filters,
-        ["pilot_id", "full_name", "email", "phone", "name", "status"],
+        ["pilot_id", "full_name", "email", "phone", "time_zone", "name", "status"],
         as_dict=True,
     )
     if not profile:
@@ -123,8 +153,8 @@ def get_pilot_by_pilot_id(pilot_id: str = None, pilot_email: str = None):
 
 
 @frappe.whitelist(allow_guest=False)
-def upsert_pilot_flight_log(**kwargs):
-    """Writes flight data received from a Tenant Box into the Pilot Flight Log."""
+def upsert_pilot_flight(**kwargs):
+    """Writes flight data received from a Tenant Box into Pilot Flight."""
     pilot_id = kwargs.get("pilot_id")
     source_flight_id = kwargs.get("source_flight_id")
     tenant_code = kwargs.get("tenant_code")
@@ -137,15 +167,15 @@ def upsert_pilot_flight_log(**kwargs):
         return APIResponse.failed(message="Pilot not found", status_code=404)
 
     existing = frappe.db.get_value(
-        "Pilot Flight Log",
+        "Pilot Flight",
         {"pilot": profile_name, "source_flight_id": source_flight_id},
         "name",
     )
 
     if existing:
-        log = frappe.get_doc("Pilot Flight Log", existing)
+        log = frappe.get_doc("Pilot Flight", existing)
     else:
-        log = frappe.new_doc("Pilot Flight Log")
+        log = frappe.new_doc("Pilot Flight")
         log.pilot = profile_name
         log.source_flight_id = source_flight_id
 
@@ -154,15 +184,16 @@ def upsert_pilot_flight_log(**kwargs):
     log.flight_hours = float(kwargs.get("flight_hours") or 0)
     flight_date = kwargs.get("flight_date", "")
     log.flight_date = flight_date[:10] if flight_date else None
+    log.location = kwargs.get("location")
     log.save(ignore_permissions=True)
     frappe.db.commit()
     return APIResponse.success()
 
 
-def get_pilot_flight_log_permission_query(user=None):
+def get_pilot_flight_permission_query(user=None):
     """
-    - System Manager / Host: all logs
-    - Pilot Role: only logs belonging to their own Pilot Profile
+    - System Manager / Host: all flights
+    - Pilot Role: only flights belonging to their own Pilot Profile
     """
     if not user:
         user = frappe.session.user
@@ -176,13 +207,19 @@ def get_pilot_flight_log_permission_query(user=None):
         profile_name = frappe.db.get_value("Pilot Profile", {"user": user}, "name")
         if not profile_name:
             return "1=0"
-        return f"`tabPilot Flight Log`.`pilot` = {frappe.db.escape(profile_name)}"
+        return f"`tabPilot Flight`.`pilot` = {frappe.db.escape(profile_name)}"
 
     return "1=0"
 
 
+def get_pilot_flight_log_permission_query(user=None):
+    return get_pilot_flight_permission_query(user=user)
+
+
 @frappe.whitelist(allow_guest=True)
-def register_pilot(full_name: str, email: str, password: str, phone: str = None):
+def register_pilot(
+    full_name: str, email: str, password: str, phone: str = None, time_zone: str = None
+):
     """Self-registration endpoint for pilots. Creates a User with Pilot Role."""
     if not full_name or not email or not password:
         return APIResponse.failed(message="All fields are required", status_code=400)
@@ -193,11 +230,15 @@ def register_pilot(full_name: str, email: str, password: str, phone: str = None)
     if len(password) < 8:
         return APIResponse.failed(message="Password must be at least 8 characters", status_code=400)
 
+    normalized_phone = _normalize_phone(phone)
+    normalized_time_zone = _normalize_time_zone(time_zone) or get_system_timezone()
+
     try:
         user = frappe.new_doc("User")
         user.email = email
         user.first_name = full_name
-        user.mobile_no = phone or ""
+        user.phone = normalized_phone
+        user.time_zone = normalized_time_zone
         user.send_welcome_email = 0
         user.role_profile_name = "Pilot"
         user.module_profile = "Pilot"
