@@ -62,7 +62,7 @@
   },
   {
    "fieldname": "total_flight_hours",
-   "fieldtype": "Float",
+   "fieldtype": "Duration",
    "label": "Total Flight Hours",
    "read_only": 1
   },
@@ -86,7 +86,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-04-30 08:05:09.059467",
+ "modified": "2026-05-04 15:58:20.295770",
  "modified_by": "Administrator",
  "module": "Pilot Marketplace",
  "name": "Pilot Profile",

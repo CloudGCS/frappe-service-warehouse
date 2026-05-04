@@ -380,7 +380,7 @@ document.getElementById("pilot-register-form").addEventListener("submit", functi
     }
 
     frappe.call({
-        method: "service_warehouse.service_warehouse.controller.pilot_controller.register_pilot",
+        method: "service_warehouse.pilot_marketplace.controller.pilot_controller.register_pilot",
         args: {
             full_name: full_name,
             email: email,

@@ -3,6 +3,7 @@
 
 from typing import TYPE_CHECKING
 
+from frappe.utils import flt
 from frappe.model.document import Document
 
 if TYPE_CHECKING:
@@ -10,6 +11,10 @@ if TYPE_CHECKING:
 
 
 class PilotFlightExperience(Document):
+	def validate(self):
+		if self.flight_hours is not None:
+			self.flight_hours = flt(self.flight_hours, 2)
+
 	if TYPE_CHECKING:
 		aircraft_type: DF.Data
 		flight_hours: DF.Float | None

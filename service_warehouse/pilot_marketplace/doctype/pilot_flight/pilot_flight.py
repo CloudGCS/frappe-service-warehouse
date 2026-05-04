@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 
 import frappe
 from frappe.model.document import Document
+from service_warehouse.pilot_marketplace.doctype.pilot_profile.pilot_profile import sync_total_flight_hours
 
 if TYPE_CHECKING:
 	from frappe.types import DF
@@ -29,16 +30,20 @@ class PilotFlight(Document):
 		tenant: DF.Link
 		tenant_name: DF.Data
 	# end: auto-generated types
-	if TYPE_CHECKING:
-		aircraft_name: DF.Data | None
-		flight_date: DF.Date | None
-		flight_hours: DF.Float
-		location: DF.Geolocation | None
-		pilot: DF.Link
-		source_flight_id: DF.Data | None
-		tenant: DF.Link
-		tenant_name: DF.Data | None
-	pass
+
+	def on_update(self):
+		for profile_name in self._get_affected_profiles():
+			sync_total_flight_hours(profile_name)
+
+	def after_delete(self):
+		sync_total_flight_hours(self.pilot)
+
+	def _get_affected_profiles(self):
+		affected_profiles = {self.pilot}
+		previous_doc = self.get_doc_before_save()
+		if previous_doc and previous_doc.pilot:
+			affected_profiles.add(previous_doc.pilot)
+		return {profile_name for profile_name in affected_profiles if profile_name}
 
 
 def _to_float(value):
