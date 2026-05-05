@@ -34,11 +34,17 @@ def user_validation(doc, method=None):
     if doc.doctype != "User":
         return
 
-    previous_doc = doc.get_doc_before_save()
-    if previous_doc and doc.get("username") != previous_doc.get("username"):
-        frappe.throw("Username cannot be changed")
-
     if doc.is_new():
         doc.send_welcome_email = 0
+        _sanitize_turkish_chars(doc)
+        return
+
+    # For existing users: block genuine username changes but allow sanitization
+    previous_doc = doc.get_doc_before_save()
+    if previous_doc:
+        prev_username = _replace_turkish(previous_doc.get("username") or "")
+        curr_username = _replace_turkish(doc.get("username") or "")
+        if prev_username != curr_username:
+            frappe.throw("Username cannot be changed")
 
     _sanitize_turkish_chars(doc)
