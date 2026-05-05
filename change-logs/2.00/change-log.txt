@@ -1,5 +1,5 @@
 ```
-Cloud Base App Change Log
+Warehouse App Change Log
 
 [2.00] – 05/05/2026
 
