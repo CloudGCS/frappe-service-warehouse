@@ -7,17 +7,15 @@ app_license = "mit"
 # required_apps = []
 
 
+
 fixtures = [
   {"dt": "Service Extension Type", "filters": [["name", "in", ["PS Plugin", "MC Plugin", "Web Application", "Service Container"]]]},
   {"dt": "User", "filters": [["username", "in", ["host"]]]},
   {"dt": "Service Provider", "filters": [["name", "in", ["SYSTEM"]]]},
   {"dt": "Tenant", "filters": [["name", "in", ["HOST"]]]},
-  {"dt": "Service Extension", "filters": [
-                                          ["service_provider", "in", ["SYSTEM"]],
-                                          ["extension_code", "not like", "%Test%"],
-                                          ["extension_code", "not like", "%TEST%"]
-                                        ]},
-  {"dt": "Role", "filters": [["name", "in", ["Host"]]]},
+  {"dt": "Role", "filters": [["name", "in", ["Host", "Pilot Role"]]]},
+  {"dt": "Role Profile", "filters": [["name", "in", ["Pilot"]]]},
+  {"dt": "Module Profile", "filters": [["name", "in", ["Pilot"]]]},
   {"doctype": "Custom HTML Block"},
 
 ]
@@ -28,7 +26,7 @@ fixtures = [
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/service_warehouse/css/service_warehouse.css"
-# app_include_js = "/assets/service_warehouse/js/service_warehouse.js"
+app_include_js = "/assets/service_warehouse/js/workspace_filter.js"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/service_warehouse/css/service_warehouse.css"
@@ -120,13 +118,14 @@ fixtures = [
 # Permissions evaluated in scripted ways
 
 permission_query_conditions = {
-	"Service Packet": "service_warehouse.permissions.filter_service_packets",
+  "Service Packet": "service_warehouse.permissions.filter_service_packets",
   "Service Subscription": "service_warehouse.permissions.filter_service_subscriptions",
+  "Pilot Profile": "service_warehouse.pilot_marketplace.controller.pilot_controller.get_pilot_profile_permission_query",
+  "Pilot Flight": "service_warehouse.pilot_marketplace.controller.pilot_controller.get_pilot_flight_permission_query",
 }
-#
-# has_permission = {
-# 	"Event": "frappe.desk.doctype.event.event.has_permission",
-# }
+has_permission = {
+    "Pilot Profile": "service_warehouse.pilot_marketplace.doctype.pilot_profile.pilot_profile.has_permission",
+}
 
 # DocType Class
 # ---------------
@@ -144,7 +143,12 @@ doc_events = {
     "File": {
         "before_insert": "service_warehouse.overrides.file_override.validate_file",
         "after_insert": "service_warehouse.overrides.file_override.on_update_file",
-    }
+    },
+    "User": {
+        "validate": "service_warehouse.utils.user_validation.user_validation",
+        "after_insert": "service_warehouse.pilot_marketplace.controller.pilot_controller.create_pilot_profile_if_pilot",
+        "on_update": "service_warehouse.pilot_marketplace.controller.pilot_controller.sync_pilot_profile_from_user",
+    },
 }
 
 # Scheduled Tasks
@@ -179,6 +183,9 @@ doc_events = {
 override_whitelisted_methods = {
     "get_user_boxes": "service_warehouse.service_warehouse.controller.server_box_controller.get_user_boxes",
     "update_server_box_info_data": "service_warehouse.service_warehouse.controller.server_box_controller.update_server_box_info_data",
+    "get_pilot_by_pilot_id": "service_warehouse.pilot_marketplace.controller.pilot_controller.get_pilot_by_pilot_id",
+    "register_pilot": "service_warehouse.pilot_marketplace.controller.pilot_controller.register_pilot",
+    "upsert_pilot_flight": "service_warehouse.pilot_marketplace.controller.pilot_controller.upsert_pilot_flight",
 }
 #
 # each overriding function accepts a `data` argument;

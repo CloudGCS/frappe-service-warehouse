@@ -1,0 +1,36 @@
+{
+ "based_on": "",
+ "chart_name": "My Flight Hours by Tenant",
+ "chart_type": "Custom",
+ "creation": "2026-04-30 12:51:00.000000",
+ "docstatus": 0,
+ "doctype": "Dashboard Chart",
+ "document_type": "",
+ "dynamic_filters_json": "[]",
+ "filters_json": "[]",
+ "group_by_type": "Count",
+ "idx": 0,
+ "is_public": 1,
+ "is_standard": 1,
+ "last_synced_on": "2026-04-30 12:51:00.000000",
+ "modified": "2026-04-30 12:51:00.000000",
+ "modified_by": "Administrator",
+ "module": "Pilot Marketplace",
+ "name": "My Flight Hours by Tenant",
+ "number_of_groups": 0,
+ "owner": "Administrator",
+ "parent_document_type": "",
+ "roles": [
+  {
+   "role": "Pilot Role"
+  }
+ ],
+ "source": "My Flight Hours by Tenant",
+ "time_interval": "Monthly",
+ "timeseries": 0,
+ "timespan": "Last Year",
+ "type": "Bar",
+ "use_report_chart": 0,
+ "value_based_on": "",
+ "y_axis": []
+}

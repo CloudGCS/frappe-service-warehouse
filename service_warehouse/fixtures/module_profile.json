@@ -1,0 +1,35 @@
+[
+ {
+  "block_modules": [
+   {
+    "module": "Core",
+    "parent": "Pilot",
+    "parentfield": "block_modules",
+    "parenttype": "Module Profile"
+   },
+   {
+    "module": "Automation",
+    "parent": "Pilot",
+    "parentfield": "block_modules",
+    "parenttype": "Module Profile"
+   },
+   {
+    "module": "Website",
+    "parent": "Pilot",
+    "parentfield": "block_modules",
+    "parenttype": "Module Profile"
+   },
+   {
+    "module": "Integrations",
+    "parent": "Pilot",
+    "parentfield": "block_modules",
+    "parenttype": "Module Profile"
+   }
+  ],
+  "docstatus": 0,
+  "doctype": "Module Profile",
+  "modified": "2026-04-29 17:32:02.777120",
+  "module_profile_name": "Pilot",
+  "name": "Pilot"
+ }
+]

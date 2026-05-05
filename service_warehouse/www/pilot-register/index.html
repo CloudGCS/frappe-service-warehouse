@@ -1,0 +1,414 @@
+{% extends "templates/web.html" %}
+
+{% block title %}Pilot Registration{% endblock %}
+
+{% block head_include %}
+{{ super() }}
+<style>
+.pilot-register-shell {
+    max-width: 480px;
+    margin: 60px auto;
+}
+
+.time-zone-field {
+    position: relative;
+}
+
+.time-zone-input-wrap {
+    position: relative;
+}
+
+.time-zone-search {
+    padding-right: 40px;
+}
+
+.time-zone-chevron {
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    transform: translateY(-50%);
+    color: #6c7680;
+    font-size: 12px;
+    pointer-events: none;
+    transition: transform 0.18s ease;
+}
+
+.time-zone-field.open .time-zone-chevron {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+.time-zone-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    z-index: 20;
+    display: none;
+    background: #fff;
+    border: 1px solid #d1d8dd;
+    border-radius: 14px;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+    overflow: hidden;
+}
+
+.time-zone-field.open .time-zone-dropdown {
+    display: block;
+}
+
+.time-zone-options {
+    max-height: 260px;
+    overflow-y: auto;
+    padding: 8px;
+}
+
+.time-zone-option {
+    display: block;
+    width: 100%;
+    padding: 10px 12px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: #1f272e;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.time-zone-option:hover,
+.time-zone-option.active {
+    background: #f0f4f7;
+    color: #0f172a;
+}
+
+.time-zone-option-main {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.35;
+}
+
+.time-zone-option-meta {
+    display: block;
+    margin-top: 2px;
+    font-size: 12px;
+    color: #7a838c;
+}
+
+.time-zone-empty {
+    padding: 18px 14px;
+    text-align: center;
+    color: #7a838c;
+    font-size: 13px;
+}
+</style>
+{% endblock %}
+
+{% block page_content %}
+<div class="container pilot-register-shell">
+    <div class="card shadow-sm">
+        <div class="card-body p-4">
+            <h3 class="mb-4 text-center">Pilot Registration</h3>
+
+            <div id="register-error" class="alert alert-danger d-none"></div>
+            <div id="register-success" class="alert alert-success d-none"></div>
+
+            <form id="pilot-register-form">
+                <div class="form-group mb-3">
+                    <label for="full_name">Full Name</label>
+                    <input type="text" id="full_name" class="form-control" placeholder="Enter your full name" required />
+                </div>
+                <div class="form-group mb-3">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" class="form-control" placeholder="Enter your email" required />
+                </div>
+                <div class="form-group mb-3">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="Minimum 8 characters" required />
+                </div>
+                <div class="form-group mb-3">
+                    <label for="phone">Phone Number <span class="text-muted">(optional)</span></label>
+                    <input type="tel" id="phone" class="form-control" placeholder="Enter your phone number" />
+                </div>
+                <div class="form-group mb-3">
+                    <label for="time_zone">Time Zone</label>
+                    <div class="time-zone-field" id="time_zone_field">
+                        <div class="time-zone-input-wrap">
+                            <input
+                                type="text"
+                                id="time_zone_search"
+                                class="form-control time-zone-search"
+                                placeholder="Search time zone"
+                                autocomplete="off"
+                                spellcheck="false"
+                                required
+                            />
+                            <span class="time-zone-chevron">&#9662;</span>
+                        </div>
+                        <input type="hidden" id="time_zone" value="{{ default_time_zone }}" />
+                        <div class="time-zone-dropdown" id="time_zone_dropdown">
+                            <div class="time-zone-options" id="time_zone_options"></div>
+                        </div>
+                    </div>
+                    <small class="text-muted">Type to search, then pick a matching Frappe time zone.</small>
+                </div>
+                <div class="form-group mb-4">
+                    <label>Role</label>
+                    <input type="text" class="form-control" value="Pilot" disabled />
+                </div>
+                <button type="submit" id="register-btn" class="btn btn-primary w-100">Register</button>
+            </form>
+
+            <div class="text-center mt-3">
+                <a href="/login">Already have an account? Log in</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+var timeZoneOptions = {{ time_zone_options_json | safe }};
+var timeZoneField = document.getElementById("time_zone_field");
+var timeZoneDropdown = document.getElementById("time_zone_dropdown");
+var timeZoneOptionsEl = document.getElementById("time_zone_options");
+var timeZoneSearchInput = document.getElementById("time_zone_search");
+var timeZoneValueInput = document.getElementById("time_zone");
+var activeTimeZoneIndex = -1;
+var visibleTimeZones = [];
+
+function normalizeTimeZoneQuery(value) {
+    return (value || "").trim().toLowerCase();
+}
+
+function prettyTimeZoneLabel(timeZone) {
+    return timeZone.split("_").join(" ");
+}
+
+function renderTimeZoneOptions(items) {
+    if (!items.length) {
+        timeZoneOptionsEl.innerHTML = '<div class="time-zone-empty">No matching time zones found.</div>';
+        activeTimeZoneIndex = -1;
+        return;
+    }
+
+    timeZoneOptionsEl.innerHTML = items.map(function (timeZone, index) {
+        var selectedClass = index === activeTimeZoneIndex ? " active" : "";
+        return (
+            '<button type="button" class="time-zone-option' + selectedClass + '" data-index="' + index + '" data-value="' + timeZone + '">' +
+                '<span class="time-zone-option-main">' + prettyTimeZoneLabel(timeZone) + '</span>' +
+                '<span class="time-zone-option-meta">' + timeZone + '</span>' +
+            '</button>'
+        );
+    }).join("");
+}
+
+function getFilteredTimeZones(query) {
+    var normalizedValue = normalizeTimeZoneQuery(query);
+    if (!normalizedValue) {
+        return timeZoneOptions.slice(0, 12);
+    }
+
+    var startsWith = [];
+    var contains = [];
+
+    for (var i = 0; i < timeZoneOptions.length; i++) {
+        var timeZone = timeZoneOptions[i];
+        var normalizedTimeZone = normalizeTimeZoneQuery(timeZone);
+        var normalizedPretty = normalizeTimeZoneQuery(prettyTimeZoneLabel(timeZone));
+
+        if (normalizedTimeZone.indexOf(normalizedValue) === 0 || normalizedPretty.indexOf(normalizedValue) === 0) {
+            startsWith.push(timeZone);
+        } else if (
+            normalizedTimeZone.indexOf(normalizedValue) !== -1 ||
+            normalizedPretty.indexOf(normalizedValue) !== -1
+        ) {
+            contains.push(timeZone);
+        }
+    }
+
+    return startsWith.concat(contains).slice(0, 12);
+}
+
+function openTimeZoneDropdown() {
+    timeZoneField.classList.add("open");
+}
+
+function closeTimeZoneDropdown() {
+    timeZoneField.classList.remove("open");
+    activeTimeZoneIndex = -1;
+}
+
+function resolveTimeZone(value) {
+    var normalizedValue = normalizeTimeZoneQuery(value);
+    if (!normalizedValue) {
+        return null;
+    }
+
+    for (var i = 0; i < timeZoneOptions.length; i++) {
+        if (normalizeTimeZoneQuery(timeZoneOptions[i]) === normalizedValue) {
+            return timeZoneOptions[i];
+        }
+        if (normalizeTimeZoneQuery(prettyTimeZoneLabel(timeZoneOptions[i])) === normalizedValue) {
+            return timeZoneOptions[i];
+        }
+    }
+
+    return null;
+}
+
+function syncTimeZoneValue(closeDropdown) {
+    var match = resolveTimeZone(timeZoneSearchInput.value);
+    timeZoneValueInput.value = match || "";
+    if (match) {
+        timeZoneSearchInput.value = prettyTimeZoneLabel(match);
+    }
+    if (closeDropdown) {
+        closeTimeZoneDropdown();
+    }
+    return match;
+}
+
+function refreshTimeZoneDropdown() {
+    visibleTimeZones = getFilteredTimeZones(timeZoneSearchInput.value);
+    activeTimeZoneIndex = visibleTimeZones.length ? 0 : -1;
+    renderTimeZoneOptions(visibleTimeZones);
+    openTimeZoneDropdown();
+}
+
+function setActiveTimeZone(nextIndex) {
+    if (!visibleTimeZones.length) {
+        activeTimeZoneIndex = -1;
+        renderTimeZoneOptions(visibleTimeZones);
+        return;
+    }
+
+    if (nextIndex < 0) {
+        nextIndex = visibleTimeZones.length - 1;
+    } else if (nextIndex >= visibleTimeZones.length) {
+        nextIndex = 0;
+    }
+
+    activeTimeZoneIndex = nextIndex;
+    renderTimeZoneOptions(visibleTimeZones);
+    var activeOption = timeZoneOptionsEl.querySelector(".time-zone-option.active");
+    if (activeOption) {
+        activeOption.scrollIntoView({ block: "nearest" });
+    }
+}
+
+function chooseTimeZone(timeZone) {
+    timeZoneValueInput.value = timeZone;
+    timeZoneSearchInput.value = prettyTimeZoneLabel(timeZone);
+    closeTimeZoneDropdown();
+}
+
+if (timeZoneValueInput.value) {
+    timeZoneSearchInput.value = prettyTimeZoneLabel(timeZoneValueInput.value);
+}
+
+timeZoneSearchInput.addEventListener("focus", function () {
+    refreshTimeZoneDropdown();
+});
+
+timeZoneSearchInput.addEventListener("input", function () {
+    refreshTimeZoneDropdown();
+});
+
+timeZoneSearchInput.addEventListener("keydown", function (e) {
+    if (!timeZoneField.classList.contains("open") && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
+        refreshTimeZoneDropdown();
+        e.preventDefault();
+        return;
+    }
+
+    if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setActiveTimeZone(activeTimeZoneIndex + 1);
+    } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setActiveTimeZone(activeTimeZoneIndex - 1);
+    } else if (e.key === "Enter") {
+        if (timeZoneField.classList.contains("open") && visibleTimeZones[activeTimeZoneIndex]) {
+            e.preventDefault();
+            chooseTimeZone(visibleTimeZones[activeTimeZoneIndex]);
+        }
+    } else if (e.key === "Escape") {
+        closeTimeZoneDropdown();
+    }
+});
+
+timeZoneOptionsEl.addEventListener("mousedown", function (e) {
+    var option = e.target.closest(".time-zone-option");
+    if (!option) {
+        return;
+    }
+
+    e.preventDefault();
+    chooseTimeZone(option.getAttribute("data-value"));
+});
+
+document.addEventListener("click", function (e) {
+    if (!timeZoneField.contains(e.target)) {
+        syncTimeZoneValue(true);
+    }
+});
+
+document.getElementById("pilot-register-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    var btn = document.getElementById("register-btn");
+    var errorDiv = document.getElementById("register-error");
+    var successDiv = document.getElementById("register-success");
+
+    errorDiv.classList.add("d-none");
+    successDiv.classList.add("d-none");
+    btn.disabled = true;
+    btn.textContent = "Registering...";
+
+    var full_name = document.getElementById("full_name").value.trim();
+    var email = document.getElementById("email").value.trim();
+    var password = document.getElementById("password").value;
+    var phone = document.getElementById("phone").value.trim();
+    var timeZoneMatch = syncTimeZoneValue(true);
+    var time_zone = timeZoneValueInput.value;
+
+    if (!timeZoneMatch) {
+        btn.disabled = false;
+        btn.textContent = "Register";
+        errorDiv.textContent = "Please select a valid time zone.";
+        errorDiv.classList.remove("d-none");
+        return;
+    }
+
+    frappe.call({
+        method: "service_warehouse.pilot_marketplace.controller.pilot_controller.register_pilot",
+        args: {
+            full_name: full_name,
+            email: email,
+            password: password,
+            phone: phone || null,
+            time_zone: time_zone || null
+        },
+        callback: function (data) {
+            btn.disabled = false;
+            btn.textContent = "Register";
+            var result = data.message;
+            if (result && result.status === "success") {
+                successDiv.textContent = result.message + " Redirecting to login...";
+                successDiv.classList.remove("d-none");
+                document.getElementById("pilot-register-form").reset();
+                setTimeout(function () { window.location.href = "/login"; }, 2000);
+            } else {
+                errorDiv.textContent = (result && result.message) || "Registration failed.";
+                errorDiv.classList.remove("d-none");
+            }
+        },
+        error: function () {
+            btn.disabled = false;
+            btn.textContent = "Register";
+            errorDiv.textContent = "Network error. Please try again.";
+            errorDiv.classList.remove("d-none");
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "frappe/www/login.html" %}
+
+{% block head_include %}
+{{ super() }}
+<style>
+.forgot-password-message {
+    display: none !important;
+}
+.login-footer-links {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+    font-size: 0.875rem;
+}
+</style>
+{% endblock %}
+
+{% block page_content %}
+{{ super() }}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    var fp = document.querySelector(".forgot-password-message");
+    if (fp) {
+        var wrapper = document.createElement("div");
+        wrapper.className = "login-footer-links";
+        wrapper.innerHTML = '<a href="/pilot-register">Register as Pilot</a>' +
+                            '<a href="#forgot">' + (fp.querySelector("a") ? fp.querySelector("a").textContent : "Forgot Password?") + '</a>';
+        fp.parentNode.insertBefore(wrapper, fp.nextSibling);
+    }
+});
+</script>
+{% endblock %}

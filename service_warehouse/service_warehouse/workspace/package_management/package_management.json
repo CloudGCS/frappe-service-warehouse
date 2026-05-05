@@ -1,0 +1,59 @@
+{
+ "charts": [
+  {
+   "chart_name": "System Packet Subscribtion Count",
+   "label": "System Packet Subscribtion Count"
+  }
+ ],
+ "content": "[{\"id\":\"6_o0j_taeT\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"System Package Version List\",\"col\":4}},{\"id\":\"fW0sFXicxt\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"System Packages\",\"col\":4}},{\"id\":\"gAgfM47MZP\",\"type\":\"chart\",\"data\":{\"chart_name\":\"System Packet Subscribtion Count\",\"col\":12}},{\"id\":\"4cqBskbUmh\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"System Packet Subscription List\",\"col\":12}}]",
+ "creation": "2025-10-31 09:59:37.170828",
+ "custom_blocks": [
+  {
+   "custom_block_name": "System Packet Subscription List",
+   "label": "System Packet Subscription List"
+  }
+ ],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "Package Management",
+ "links": [],
+ "modified": "2026-04-23 13:17:40.387501",
+ "modified_by": "Administrator",
+ "module": "Service Warehouse",
+ "name": "Package Management",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "Dashboard-Host",
+ "public": 1,
+ "quick_lists": [
+  {
+   "document_type": "Service Packet",
+   "label": "System Packages",
+   "quick_list_filter": "[[\"Service Packet\",\"is_system_packet\",\"=\",1,false]]"
+  },
+  {
+   "document_type": "Service Packet Version",
+   "label": "System Package Version List",
+   "quick_list_filter": "[[\"Service Packet Version\",\"owner\",\"=\",\"host@cloudgcs.com\",false]]"
+  }
+ ],
+ "roles": [
+  {
+   "role": "Host"
+  },
+  {
+   "role": "Tenant"
+  },
+  {
+   "role": "System Manager"
+  }
+ ],
+ "sequence_id": 6.0,
+ "shortcuts": [],
+ "title": "Package Management"
+}

@@ -23,7 +23,7 @@
  "is_hidden": 0,
  "label": "Dashboard-Tenant",
  "links": [],
- "modified": "2025-11-21 11:37:54.249390",
+ "modified": "2026-04-23 13:05:46.032319",
  "modified_by": "Administrator",
  "module": "Service Warehouse",
  "name": "Dashboard-Tenant",
@@ -57,7 +57,17 @@
  "parent_page": "",
  "public": 1,
  "quick_lists": [],
- "roles": [],
+ "roles": [
+  {
+   "role": "Tenant"
+  },
+  {
+   "role": "Host"
+  },
+  {
+   "role": "System Manager"
+  }
+ ],
  "sequence_id": 1.0,
  "shortcuts": [],
  "title": "Dashboard-Tenant"

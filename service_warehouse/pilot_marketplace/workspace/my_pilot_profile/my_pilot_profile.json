@@ -1,0 +1,45 @@
+{
+ "charts": [
+  {
+   "chart_name": "My Flight Hours by Tenant",
+   "label": "My Flight Hours by Tenant"
+  }
+ ],
+ "content": "[{\"id\":\"mpp_header_1\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>My Pilot Profile</b></span><br><span class=\\\"text-muted\\\">Your personal flight command center</span>\",\"col\":12}},{\"id\":\"mpp_block_1\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Pilot Flight Snapshot\",\"col\":12}},{\"id\":\"mpp_chart_1\",\"type\":\"chart\",\"data\":{\"chart_name\":\"My Flight Hours by Tenant\",\"col\":12}},{\"id\":\"mpp_block_3\",\"type\":\"custom_block\",\"data\":{\"custom_block_name\":\"Pilot Flight Atlas\",\"col\":12}}]",
+ "creation": "2026-04-19 00:00:00",
+ "custom_blocks": [
+  {
+   "custom_block_name": "Pilot Flight Snapshot"
+  },
+  {
+   "custom_block_name": "Pilot Flight Atlas"
+  }
+ ],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "share-people",
+ "idx": 0,
+ "indicator_color": "",
+ "is_hidden": 0,
+ "label": "My Pilot Profile",
+ "links": [],
+ "modified": "2026-04-30 08:23:47.470312",
+ "modified_by": "Administrator",
+ "module": "Pilot Marketplace",
+ "name": "My Pilot Profile",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [
+  {
+   "role": "Pilot Role"
+  }
+ ],
+ "sequence_id": 11.0,
+ "shortcuts": [],
+ "title": "My Pilot Profile"
+}
