@@ -3,6 +3,19 @@ Cloud Base App Change Log
 
 [2.00] – 05/05/2026
 
+✨ Added
+- Added a new column to the Packet List table to display the packages the user is subscribed to.
+- A new service extension system has been introduced, allowing plugin developers to include additional files when creating service extensions.
+- A new Pilot Profile record is automatically created when a user with the Pilot Role is added to the system. Each profile is assigned a unique Pilot ID in the format PILOT-XXXXXX.
+    - Pilot profiles include full name, email, phone number, status (Active / Inactive / Pending), and an optional certificates table with file attachments and expiry dates.
+    - A new Available Pilots page is accessible to Tenant and Host users, listing all active pilots with their contact information and uploaded certificates.
+    - Pilots can view their own flight history across all tenants from a dedicated My Pilot Profile page.
+    - A new API endpoint allows external systems to retrieve pilot information by Pilot ID.
+    - A new API endpoint allows tenant boxes to push flight log data into the warehouse. If a flight log already exists for the same source flight, it is updated rather than duplicated.
+    - Tenant users can read all active pilot profiles. Host users can also edit pilot profiles. Pilots can only view and edit their own profile.
+    - Pilots can only view their own flight entries.
+
 🔄 Changed
-- Box URL field validation added when creating a Server Box; now only URLs following standard format are allowed
+- Fixed an issue where users could duplicate Service Extensions, packet versions, or Service Packets created by other users, preventing unauthorized duplication.
+- Server box dashboards have been updated to provide a more user-friendly experience for both tenant and host users.
 ```
