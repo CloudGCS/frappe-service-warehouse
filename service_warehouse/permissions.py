@@ -1,6 +1,10 @@
 import frappe
 
 
+def filter_role_profiles(user):
+    return "`tabRole Profile`.`name` != 'Pilot'"
+
+
 def filter_service_packets(user):
   if not user:
     user = frappe.session.user

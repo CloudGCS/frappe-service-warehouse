@@ -120,6 +120,7 @@ app_include_js = "/assets/service_warehouse/js/workspace_filter.js"
 permission_query_conditions = {
   "Service Packet": "service_warehouse.permissions.filter_service_packets",
   "Service Subscription": "service_warehouse.permissions.filter_service_subscriptions",
+  "Role Profile": "service_warehouse.permissions.filter_role_profiles",
   "Pilot Profile": "service_warehouse.pilot_marketplace.controller.pilot_controller.get_pilot_profile_permission_query",
   "Pilot Flight": "service_warehouse.pilot_marketplace.controller.pilot_controller.get_pilot_flight_permission_query",
 }
