@@ -152,7 +152,16 @@
   }
  ],
  "index_web_pages_for_search": 1,
- "links": [],
+ "links": [
+  {
+   "group": "Packet Versions",
+   "is_child_table": 1,
+   "link_doctype": "Service Packet Extension",
+   "link_fieldname": "service_extension",
+   "parent_doctype": "Service Packet Version",
+   "table_fieldname": "extensions"
+  }
+ ],
  "modified": "2026-04-01 00:23:03.188282",
  "modified_by": "Administrator",
  "module": "Service Marketplace",
