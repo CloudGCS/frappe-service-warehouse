@@ -463,3 +463,99 @@ def get_total_subscribed_packets_for_host():
 
     grouped = dict(grouped)
     return grouped
+
+
+@frappe.whitelist()
+def get_latest_server_box_version():
+    latest = frappe.db.get_all(
+        "Server Box Version",
+        fields=["name", "version_name"],
+        order_by="name desc",
+        limit=1
+    )
+    if not latest:
+        return {"value": "N/A", "route": ["list", "Server Box Version"]}
+
+    return {
+        "value": latest[0]["version_name"],
+        "route": ["list", "Server Box Version"]
+    }
+
+
+@frappe.whitelist()
+def get_up_to_date_boxes_count_for_tenant():
+    tenant_doc = get_tenant_doc()
+    if tenant_doc is None:
+        return {"value": 0}
+
+    latest = frappe.db.get_all(
+        "Server Box Version",
+        fields=["name"],
+        order_by="name desc",
+        limit=1
+    )
+    if not latest:
+        return {"value": 0}
+
+    latest_version = str(latest[0]["name"])
+
+    count = frappe.db.count(
+        "Server Box",
+        filters={"tenant": tenant_doc.name, "server_box_version": latest_version}
+    )
+
+    return {
+        "value": count,
+        "route": ["list", "Server Box"],
+        "route_options": {"tenant": tenant_doc.name, "server_box_version": latest_version}
+    }
+
+
+@frappe.whitelist()
+def get_outdated_boxes_count_for_tenant():
+    tenant_doc = get_tenant_doc()
+    if tenant_doc is None:
+        return {"value": 0}
+
+    latest = frappe.db.get_all(
+        "Server Box Version",
+        fields=["name"],
+        order_by="name desc",
+        limit=1
+    )
+    if not latest:
+        return {"value": 0}
+
+    latest_version = str(latest[0]["name"])
+
+    total = frappe.db.count("Server Box", filters={"tenant": tenant_doc.name})
+    up_to_date = frappe.db.count(
+        "Server Box",
+        filters={"tenant": tenant_doc.name, "server_box_version": latest_version}
+    )
+
+    return {
+        "value": total - up_to_date,
+        "route": ["list", "Server Box"],
+        "route_options": {"tenant": tenant_doc.name}
+    }
+
+
+@frappe.whitelist()
+def get_total_extensions_for_tenant():
+    tenant_doc = get_tenant_doc()
+    if tenant_doc is None:
+        return {"value": 0}
+
+    provider = frappe.get_doc("Service Provider", tenant_doc.provider_code)
+
+    count = frappe.db.count(
+        "Service Extension",
+        filters={"service_provider": provider.name}
+    )
+
+    return {
+        "value": count,
+        "route": ["list", "Service Extension"],
+        "route_options": {"service_provider": provider.name}
+    }
