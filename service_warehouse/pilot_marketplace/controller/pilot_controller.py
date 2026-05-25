@@ -194,6 +194,7 @@ def upsert_pilot_flight(**kwargs):
 def get_pilot_flight_permission_query(user=None):
     """
     - System Manager / Host: all flights
+    - Tenant: only flights belonging to their own Tenant record
     - Pilot Role: only flights belonging to their own Pilot Profile
     """
     if not user:
@@ -209,6 +210,10 @@ def get_pilot_flight_permission_query(user=None):
         if not profile_name:
             return "1=0"
         return f"`tabPilot Flight`.`pilot` = {frappe.db.escape(profile_name)}"
+
+    tenant_name = frappe.db.get_value("Tenant", {"user": user}, "name")
+    if tenant_name:
+        return f"`tabPilot Flight`.`tenant` = {frappe.db.escape(tenant_name)}"
 
     return "1=0"
 
