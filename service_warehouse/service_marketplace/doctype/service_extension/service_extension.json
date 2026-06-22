@@ -16,18 +16,19 @@
   "version",
   "section_break_mqcj",
   "description",
-  "simulator_file",
-  "manifest_yaml",
-  "sandbox_policy_json",
-  "artifact_uri",
-  "artifact_sha256",
   "plugin_info",
   "library_name",
   "is_background_plugin",
   "is_build_in",
   "file",
   "files",
-  "config"
+  "config",
+  "mc_plugin_artifacts",
+  "manifest_yaml",
+  "simulator_file",
+  "artifact_uri",
+  "artifact_sha256",
+  "sandbox_policy_json"
  ],
  "fields": [
   {
@@ -97,7 +98,7 @@
    "in_list_view": 1,
    "is_virtual": 1,
    "label": "Version",
-   "options": "f\"v{doc.major}.{doc.minor}\"",
+   "options": "f\"{doc.major}.{doc.minor}\"",
    "read_only": 1
   },
   {
@@ -114,34 +115,6 @@
    "fieldname": "description",
    "fieldtype": "Text",
    "label": "Description"
-  },
-  {
-   "fieldname": "simulator_file",
-   "fieldtype": "Attach",
-   "label": "Simulator File"
-  },
-  {
-   "fieldname": "manifest_yaml",
-   "fieldtype": "Code",
-   "label": "Manifest YAML",
-   "options": "YAML"
-  },
-  {
-   "fieldname": "sandbox_policy_json",
-   "fieldtype": "Code",
-   "label": "Sandbox Policy",
-   "options": "JSON"
-  },
-  {
-   "fieldname": "artifact_uri",
-   "fieldtype": "Data",
-   "label": "Artifact URI",
-   "length": 500
-  },
-  {
-   "fieldname": "artifact_sha256",
-   "fieldtype": "Data",
-   "label": "Artifact SHA256"
   },
   {
    "fieldname": "files",
@@ -182,6 +155,39 @@
    "hidden": 1,
    "label": "Built-in Web Application Version",
    "read_only": 1
+  },
+  {
+   "fieldname": "mc_plugin_artifacts",
+   "fieldtype": "Tab Break",
+   "label": "MC Plugin Artifacts"
+  },
+  {
+   "fieldname": "manifest_yaml",
+   "fieldtype": "Code",
+   "label": "Manifest YAML",
+   "options": "YAML"
+  },
+  {
+   "fieldname": "simulator_file",
+   "fieldtype": "Attach",
+   "label": "Simulator File"
+  },
+  {
+   "fieldname": "artifact_uri",
+   "fieldtype": "Data",
+   "label": "Artifact URI",
+   "length": 500
+  },
+  {
+   "fieldname": "artifact_sha256",
+   "fieldtype": "Data",
+   "label": "Artifact SHA256"
+  },
+  {
+   "fieldname": "sandbox_policy_json",
+   "fieldtype": "Code",
+   "label": "Sandbox Policy",
+   "options": "JSON"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -195,7 +201,7 @@
    "table_fieldname": "extensions"
   }
  ],
- "modified": "2026-06-22 00:00:00.000000",
+ "modified": "2026-06-22 00:02:00.000000",
  "modified_by": "Administrator",
  "module": "Service Marketplace",
  "name": "Service Extension",

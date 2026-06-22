@@ -44,6 +44,32 @@ class TestServiceExtensionController(FrappeTestCase):
 		self.assertEqual(parse_manifest_version("version: 1.2\n"), (1, 20))
 		self.assertEqual(parse_manifest_version("version: 1.2.3\n"), (1, 23))
 
+	def test_user_entered_version_updates_manifest_version_on_creation(self):
+		doc = frappe.get_doc(
+			{
+				"doctype": "Service Extension",
+				"manifest_yaml": "version: 1.2.8\n",
+				"major": 2,
+				"minor": 0,
+			}
+		)
+
+		doc.validate_manifest_version()
+
+		self.assertEqual((doc.major, doc.minor), (2, 0))
+		self.assertEqual(doc.manifest_yaml, "version: 2.0\n")
+
+	def test_non_mc_plugin_does_not_validate_manifest_version(self):
+		doc = frappe.get_doc(
+			{
+				"doctype": "Service Extension",
+				"extension_type": "Web Application",
+				"manifest_yaml": "version: not-a-version\n",
+			}
+		)
+
+		doc.validate_manifest_version()
+
 	def test_create_release_uses_session_provider_and_attaches_simulator_file(self):
 		response = self._create_release(version="1.2.3")
 

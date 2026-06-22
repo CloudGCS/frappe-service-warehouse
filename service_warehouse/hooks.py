@@ -187,6 +187,7 @@ override_whitelisted_methods = {
     "get_pilot_by_pilot_id": "service_warehouse.pilot_marketplace.controller.pilot_controller.get_pilot_by_pilot_id",
     "register_pilot": "service_warehouse.pilot_marketplace.controller.pilot_controller.register_pilot",
     "upsert_pilot_flight": "service_warehouse.pilot_marketplace.controller.pilot_controller.upsert_pilot_flight",
+    "create_service_extension_release": "service_warehouse.service_marketplace.controller.service_extension_controller.create_service_extension_release",
 }
 #
 # each overriding function accepts a `data` argument;

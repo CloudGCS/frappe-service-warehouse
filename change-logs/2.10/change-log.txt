@@ -1,0 +1,22 @@
+```
+Warehouse App Change Log
+
+[2.10] – 23/06/2026
+
+✨ Added
+- Added a connection from Service Extension to Service Packet Version.
+- Added a connection from Service Packet Version to Service Packet.
+- Added a new Version Information section at the top of the page.
+- Added summary cards for Latest Server Box Version, Up-to-date Server Boxes, and Outdated Server Boxes.
+- Added a Total Extensions For Tenant summary card below the version overview section.
+- A new MC plugin service extension system has been implemented.
+- A new API to allow creation of service extensions from outside the server.
+
+🔄 Changed
+- The Pilot role is now hidden from the Role Profile dropdown during user creation.
+
+🐞 Bugfix
+- Turkish characters are now sanitized during user creation
+- Fixed an issue where tenants could modify the Default Layout
+
+```

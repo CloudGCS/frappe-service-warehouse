@@ -13,6 +13,7 @@ from service_warehouse.service_warehouse.doctype.tenant.tenant import get_host_u
 
 
 MANIFEST_VERSION_PATTERN = re.compile(r"^v?(\d+)\.(\d+)(?:\.(\d+))?(?:[-+].*)?$")
+MANIFEST_VERSION_LINE_PATTERN = re.compile(r"^(version\s*:\s*)[^#\r\n]*?(\s*(?:#.*)?)$", re.MULTILINE)
 IMMUTABLE_FIELDNAMES = (
 	"extension_code",
 	"title",
@@ -50,6 +51,16 @@ def parse_manifest_version(manifest_yaml):
 
 	major_part, minor_part, patch_part = match.groups()
 	return int(major_part), int(f"{minor_part}{patch_part or '0'}")
+
+
+def set_manifest_version(manifest_yaml, version):
+	"""Replace the top-level manifest version without reformatting the rest of the YAML."""
+	updated_manifest, replacements = MANIFEST_VERSION_LINE_PATTERN.subn(
+		lambda match: f"{match.group(1)}{version}{match.group(2)}", manifest_yaml, count=1
+	)
+	if not replacements:
+		frappe.throw(_("Manifest YAML must include a top-level version field."))
+	return updated_manifest
 
 class ServiceExtension(Document):
 	# begin: auto-generated types
@@ -91,16 +102,46 @@ class ServiceExtension(Document):
 		self.rename_uploaded_file()
 
 	def validate_manifest_version(self):
-		if not self.manifest_yaml:
+		if self.extension_type != "MC Plugin" or not self.manifest_yaml:
 			return
 
 		major, minor = parse_manifest_version(self.manifest_yaml)
 		if self.is_new():
+			has_major = self.major not in (None, "")
+			has_minor = self.minor not in (None, "")
+			if has_major or has_minor:
+				if not has_major or not has_minor:
+					frappe.throw(_("Both Major and Minor are required when setting a Service Extension version."))
+				user_major = int(self.major)
+				user_minor = int(self.minor)
+				if (user_major, user_minor) != (major, minor):
+					self.manifest_yaml = set_manifest_version(
+						self.manifest_yaml, f"{user_major}.{user_minor}"
+					)
+				self.major = user_major
+				self.minor = user_minor
+				return
+
 			self.major = major
 			self.minor = minor
 			return
 
-		if self.major != major or self.minor != minor:
+		if not self.has_value_changed("manifest_yaml"):
+			return
+
+		old_doc = self.get_doc_before_save()
+		if not old_doc or not old_doc.manifest_yaml:
+			return
+
+		try:
+			old_major, old_minor = parse_manifest_version(old_doc.manifest_yaml)
+		except frappe.ValidationError:
+			return
+
+		if (old_major, old_minor) == (self.major, self.minor) and (major, minor) != (
+			self.major,
+			self.minor,
+		):
 			frappe.throw(_("Manifest version cannot change an existing Service Extension release."))
 
 	def validate_sandbox_policy(self):
