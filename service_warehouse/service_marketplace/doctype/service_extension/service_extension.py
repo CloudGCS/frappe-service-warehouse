@@ -3,10 +3,53 @@
 
 
 import os
+import re
+
 import frappe
+import yaml
 from frappe.model.document import Document
 from frappe import _
 from service_warehouse.service_warehouse.doctype.tenant.tenant import get_host_user, get_session_tenant
+
+
+MANIFEST_VERSION_PATTERN = re.compile(r"^v?(\d+)\.(\d+)(?:\.(\d+))?(?:[-+].*)?$")
+IMMUTABLE_FIELDNAMES = (
+	"extension_code",
+	"title",
+	"service_provider",
+	"extension_type",
+	"library_name",
+	"major",
+	"minor",
+	"description",
+	"is_background_plugin",
+	"is_build_in",
+	"file",
+	"files",
+	"config",
+)
+
+
+def parse_manifest_version(manifest_yaml):
+	"""Return the packed warehouse major/minor values from a manifest version."""
+	if not manifest_yaml:
+		frappe.throw(_("Manifest YAML is required."))
+
+	try:
+		manifest = yaml.safe_load(manifest_yaml) or {}
+	except yaml.YAMLError:
+		frappe.throw(_("Manifest YAML must be valid YAML."))
+
+	if not isinstance(manifest, dict):
+		frappe.throw(_("Manifest YAML must be a YAML object."))
+
+	version = str(manifest.get("version") or "").strip()
+	match = MANIFEST_VERSION_PATTERN.fullmatch(version)
+	if not match:
+		frappe.throw(_("Manifest YAML version must look like x.y or x.y.z."))
+
+	major_part, minor_part, patch_part = match.groups()
+	return int(major_part), int(f"{minor_part}{patch_part or '0'}")
 
 class ServiceExtension(Document):
 	# begin: auto-generated types
@@ -18,6 +61,8 @@ class ServiceExtension(Document):
 		from frappe.types import DF
 		from service_warehouse.service_marketplace.doctype.service_extension_file.service_extension_file import ServiceExtensionFile
 
+		artifact_sha256: DF.Data | None
+		artifact_uri: DF.Data | None
 		config: DF.JSON | None
 		description: DF.Text | None
 		extension_code: DF.Data
@@ -28,15 +73,71 @@ class ServiceExtension(Document):
 		is_build_in: DF.Check
 		library_name: DF.Data
 		major: DF.Int
+		manifest_yaml: DF.Code | None
 		minor: DF.Int
+		sandbox_policy_json: DF.Code | None
 		service_provider: DF.Link | None
+		simulator_file: DF.Attach | None
 		title: DF.Data
 		version: DF.Data | None
 	# end: auto-generated types
 
 	def validate(self):
 		self.check_for_underscore("Extension Code", self.extension_code)
+		self.validate_manifest_version()
+		self.validate_sandbox_policy()
+		self.validate_artifact_sha256()
+		self.validate_immutable_fields()
 		self.rename_uploaded_file()
+
+	def validate_manifest_version(self):
+		if not self.manifest_yaml:
+			return
+
+		major, minor = parse_manifest_version(self.manifest_yaml)
+		if self.is_new():
+			self.major = major
+			self.minor = minor
+			return
+
+		if self.major != major or self.minor != minor:
+			frappe.throw(_("Manifest version cannot change an existing Service Extension release."))
+
+	def validate_sandbox_policy(self):
+		if not self.sandbox_policy_json:
+			return
+
+		try:
+			policy = frappe.parse_json(self.sandbox_policy_json)
+		except Exception:
+			frappe.throw(_("Sandbox Policy must be valid JSON."))
+
+		if not isinstance(policy, dict):
+			frappe.throw(_("Sandbox Policy must be a JSON object."))
+
+	def validate_artifact_sha256(self):
+		if self.artifact_sha256 and not re.fullmatch(r"[0-9a-fA-F]{64}", self.artifact_sha256):
+			frappe.throw(_("Artifact SHA256 must be a SHA-256 digest."))
+
+	def validate_immutable_fields(self):
+		if self.is_new():
+			return
+
+		old_doc = self.get_doc_before_save()
+		if not old_doc:
+			return
+
+		for fieldname in IMMUTABLE_FIELDNAMES:
+			if self.immutable_field_changed(fieldname, old_doc):
+				frappe.throw(_("{0} cannot be changed after a Service Extension is created.").format(fieldname))
+
+	def immutable_field_changed(self, fieldname, old_doc):
+		if fieldname != "files":
+			return self.get(fieldname) != old_doc.get(fieldname)
+
+		current_files = [row.as_dict() for row in self.get("files", [])]
+		previous_files = [row.as_dict() for row in old_doc.get("files", [])]
+		return current_files != previous_files
 
 	def check_for_underscore(self, field_name, value):
 		if "_" in value:
@@ -81,6 +182,7 @@ class ServiceExtension(Document):
 				self.file = file_doc.file_url
 
 	def before_insert(self):
+		self.validate_manifest_version()
 		user = frappe.session.user
 		# todo: we need to make a better check for fixtures - this is a temporary fix
 		if user == "Administrator" and self.service_provider == "SYSTEM":
@@ -108,33 +210,10 @@ class ServiceExtension(Document):
 		if not frappe.db.exists("Service Provider", tenant.service_provider):
 			frappe.throw("You are not a valid tenant with well defined service provider.")
 
-		self._check_duplicate_from_other_owner()
-
 		self.service_provider = tenant.service_provider
 
 		if not self.is_version_valid():
-			frappe.throw("Your version number should progress, can not be downgrading from the latest version created.")
-
-	def _check_duplicate_from_other_owner(self):
-		"""Prevent inserting an extension that is a copy of another user's extension.
-		Must be called BEFORE self.service_provider is overwritten.
-		"""
-		if not self.service_provider:
-			# New doc created from scratch – service_provider is empty, nothing to check.
-			return
-		existing_owner = frappe.db.get_value(
-			"Service Extension",
-			{
-				"extension_code": self.extension_code,
-				"extension_type": self.extension_type,
-				"major": self.major,
-				"minor": self.minor,
-				"service_provider": self.service_provider,
-			},
-			"owner",
-		)
-		if existing_owner and existing_owner != frappe.session.user:
-			frappe.throw(_("You cannot duplicate a service extension that belongs to another user."))
+			frappe.throw(_("A Service Extension with the same library version already exists."))
 
 	def after_insert(self):
 		if self.owner == "Administrator" and self.service_provider == "SYSTEM":
@@ -156,17 +235,12 @@ class ServiceExtension(Document):
 			file_doc.insert(ignore_permissions=True)
 
 	def is_version_valid(self):
-		# self has major and minor version first retrive all the versions with same library name
-		versions = frappe.get_all("Service Extension",
-														filters={"service_provider": self.service_provider, "extension_code": self.extension_code, "extension_type": self.extension_type},
-														fields=["major", "minor"])
-
-		if not versions:
-			return True
-		# check if the version is greater
-		for version in versions:
-			if version.major > self.major:
-				return False
-			elif version.major == self.major and version.minor >= self.minor:
-				return False
-		return True
+		return not frappe.db.exists(
+			"Service Extension",
+			{
+				"service_provider": self.service_provider,
+				"library_name": self.library_name,
+				"major": self.major,
+				"minor": self.minor,
+			},
+		)

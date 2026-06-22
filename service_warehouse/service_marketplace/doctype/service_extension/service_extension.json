@@ -16,6 +16,11 @@
   "version",
   "section_break_mqcj",
   "description",
+  "simulator_file",
+  "manifest_yaml",
+  "sandbox_policy_json",
+  "artifact_uri",
+  "artifact_sha256",
   "plugin_info",
   "library_name",
   "is_background_plugin",
@@ -111,6 +116,34 @@
    "label": "Description"
   },
   {
+   "fieldname": "simulator_file",
+   "fieldtype": "Attach",
+   "label": "Simulator File"
+  },
+  {
+   "fieldname": "manifest_yaml",
+   "fieldtype": "Code",
+   "label": "Manifest YAML",
+   "options": "YAML"
+  },
+  {
+   "fieldname": "sandbox_policy_json",
+   "fieldtype": "Code",
+   "label": "Sandbox Policy",
+   "options": "JSON"
+  },
+  {
+   "fieldname": "artifact_uri",
+   "fieldtype": "Data",
+   "label": "Artifact URI",
+   "length": 500
+  },
+  {
+   "fieldname": "artifact_sha256",
+   "fieldtype": "Data",
+   "label": "Artifact SHA256"
+  },
+  {
    "fieldname": "files",
    "fieldtype": "Table",
    "label": "Files",
@@ -162,7 +195,7 @@
    "table_fieldname": "extensions"
   }
  ],
- "modified": "2026-04-01 00:23:03.188282",
+ "modified": "2026-06-22 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "Service Marketplace",
  "name": "Service Extension",

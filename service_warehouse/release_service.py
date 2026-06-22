@@ -64,6 +64,11 @@ def get_service_package(packet_release_version):
 			"is_background_plugin": extension_doc.is_background_plugin,
 			"is_build_in": extension_doc.is_build_in,
 			"file": extension_doc.file,
+			"simulator_file": extension_doc.simulator_file,
+			"manifest_yaml": extension_doc.manifest_yaml,
+			"sandbox_policy_json": extension_doc.sandbox_policy_json,
+			"artifact_uri": extension_doc.artifact_uri,
+			"artifact_sha256": extension_doc.artifact_sha256,
 			"config": json.loads(extension_doc.config) if extension_doc.config else {},
 			"files": extension_doc.files
 		}
@@ -82,4 +87,3 @@ def get_service_package(packet_release_version):
 		},
 		'extensions': extension_docs
 	}
-
