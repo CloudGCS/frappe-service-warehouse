@@ -125,12 +125,14 @@ def create_service_extension_release():
 		{
 			"service_provider": service_provider,
 			"library_name": library_name,
+			"extension_type": extension_type,
 			"major": major,
 			"minor": minor,
 		},
 	):
 		return APIResponse.failed(
-			message="A Service Extension with the same library version already exists.", status_code=409
+			message="A Service Extension with the same library, extension type, and version already exists.",
+			status_code=409,
 		)
 
 	doc = frappe.get_doc(

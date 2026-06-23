@@ -91,7 +91,18 @@ class TestServiceExtensionController(FrappeTestCase):
 
 		self.assertEqual(response["status"], "failed")
 		self.assertEqual(frappe.local.response["http_status_code"], 409)
-		self.assertIn("same library version", response["message"])
+		self.assertIn("same library, extension type, and version", response["message"])
+
+	def test_same_library_version_is_allowed_for_different_extension_types(self):
+		self._create_release(version="1.2")
+		payload = self._payload(version="1.2")
+		payload["extension_type"] = "PS Plugin"
+
+		response = self._call_controller(payload)
+
+		self.assertEqual(response["status"], "success")
+		self.assertEqual(response["data"]["major"], 1)
+		self.assertEqual(response["data"]["minor"], 20)
 
 	def test_only_release_artifact_fields_are_mutable(self):
 		response = self._create_release(version="1.2")
@@ -101,6 +112,11 @@ class TestServiceExtensionController(FrappeTestCase):
 		doc.save(ignore_permissions=True)
 		doc.reload()
 		self.assertEqual(doc.artifact_uri, "s3://bucket/updated-plugin.tar.gz")
+
+		doc.simulator_file = "/private/files/replacement-simulator.zip"
+		doc.save(ignore_permissions=True)
+		doc.reload()
+		self.assertEqual(doc.simulator_file, "/private/files/replacement-simulator.zip")
 
 		doc.title = "Changed title"
 		with self.assertRaises(frappe.ValidationError):

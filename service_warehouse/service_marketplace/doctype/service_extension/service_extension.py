@@ -25,7 +25,6 @@ IMMUTABLE_FIELDNAMES = (
 	"description",
 	"is_background_plugin",
 	"is_build_in",
-	"file",
 	"files",
 	"config",
 )
@@ -254,7 +253,7 @@ class ServiceExtension(Document):
 		self.service_provider = tenant.service_provider
 
 		if not self.is_version_valid():
-			frappe.throw(_("A Service Extension with the same library version already exists."))
+			frappe.throw(_("A Service Extension with the same library, extension type, and version already exists."))
 
 	def after_insert(self):
 		if self.owner == "Administrator" and self.service_provider == "SYSTEM":
@@ -281,6 +280,7 @@ class ServiceExtension(Document):
 			{
 				"service_provider": self.service_provider,
 				"library_name": self.library_name,
+				"extension_type": self.extension_type,
 				"major": self.major,
 				"minor": self.minor,
 			},
