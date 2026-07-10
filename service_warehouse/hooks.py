@@ -123,18 +123,13 @@ permission_query_conditions = {
   "Role Profile": "service_warehouse.permissions.filter_role_profiles",
   "Pilot Profile": "service_warehouse.pilot_marketplace.controller.pilot_controller.get_pilot_profile_permission_query",
   "Pilot Flight": "service_warehouse.pilot_marketplace.controller.pilot_controller.get_pilot_flight_permission_query",
+  "User": "service_warehouse.permissions.filter_users",
+  "Server Box": "service_warehouse.permissions.filter_server_boxes",
 }
 has_permission = {
     "Pilot Profile": "service_warehouse.pilot_marketplace.doctype.pilot_profile.pilot_profile.has_permission",
+    "User": "service_warehouse.permissions.user_has_permission",
 }
-
-# DocType Class
-# ---------------
-# Override standard doctype classes
-
-# override_doctype_class = {
-# 	"ToDo": "custom_app.overrides.CustomToDo"
-# }
 
 # Document Events
 # ---------------

@@ -1,5 +1,59 @@
 import frappe
 
+PILOT_ROLE = "Pilot Role"
+
+
+def filter_users(user):
+    """
+    Pilot rolündeki kullanıcılar yalnızca kendi User kaydını liste görünümünde görebilir.
+    Diğer roller için kısıtlama uygulanmaz.
+    """
+    if not user:
+        user = frappe.session.user
+
+    roles = frappe.get_roles(user)
+
+    if PILOT_ROLE in roles and "System Manager" not in roles and "Host" not in roles:
+        return "`tabUser`.`name` = {user}".format(user=frappe.db.escape(user))
+
+    return ""
+
+
+def user_has_permission(doc, user):
+    """
+    Pilot rolündeki kullanıcılar yalnızca kendi User dokümanını açabilir.
+    Diğer roller için kısıtlama uygulanmaz.
+    """
+    if not user:
+        user = frappe.session.user
+
+    roles = frappe.get_roles(user)
+
+    if PILOT_ROLE in roles and "System Manager" not in roles and "Host" not in roles:
+        return doc.name == user
+
+    return True
+
+
+def filter_server_boxes(user):
+    """
+    Tenant kullanıcılar yalnızca kendi Tenant'ına ait Server Box'ları görür.
+    Host / System Manager tümünü görür.
+    """
+    if not user:
+        user = frappe.session.user
+
+    roles = frappe.get_roles(user)
+
+    if "System Manager" in roles or "Host" in roles:
+        return ""
+
+    tenant_name = frappe.db.get_value("Tenant", {"user": user}, "name")
+    if tenant_name:
+        return "`tabServer Box`.`tenant` = {tenant}".format(tenant=frappe.db.escape(tenant_name))
+
+    return "1=0"
+
 
 def filter_role_profiles(user):
     return "`tabRole Profile`.`name` != 'Pilot'"
