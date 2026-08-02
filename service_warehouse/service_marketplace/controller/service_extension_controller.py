@@ -1,80 +1,21 @@
-import re
+import json
 
 import frappe
-from frappe import _
 from frappe.utils.file_manager import save_file
 
-from service_warehouse.service_marketplace.doctype.service_extension.service_extension import (
-	parse_manifest_version,
-)
 from service_warehouse.service_warehouse.doctype.tenant.tenant import get_session_tenant
 from service_warehouse.utils.api_utils import APIResponse
 
 
+PS_PLUGIN_EXTENSION_TYPE = "PS Plugin"
 REQUIRED_METADATA_FIELDS = (
 	"extension_code",
 	"title",
-	"manifest_yaml",
-	"sandbox_policy_json",
-	"artifact_uri",
-	"artifact_sha256",
+	"library_name",
+	"build_file",
+	"major",
+	"minor",
 )
-SHA256_PATTERN = re.compile(r"^[0-9a-fA-F]{64}$")
-
-
-def _get_metadata():
-	metadata = frappe.form_dict.get("metadata")
-	if not metadata:
-		return None, APIResponse.failed(message="metadata is required.", status_code=400)
-
-	try:
-		metadata = frappe.parse_json(metadata)
-	except Exception:
-		return None, APIResponse.failed(message="metadata must be valid JSON.", status_code=400)
-
-	if not isinstance(metadata, dict):
-		return None, APIResponse.failed(message="metadata must be a JSON object.", status_code=400)
-
-	missing = [fieldname for fieldname in REQUIRED_METADATA_FIELDS if not str(metadata.get(fieldname) or "").strip()]
-	if missing:
-		return None, APIResponse.failed(
-			message="Missing release fields: " + ", ".join(missing), status_code=400
-		)
-
-	return metadata, None
-
-
-def _get_simulator_file():
-	request = getattr(frappe, "request", None)
-	files = getattr(request, "files", None)
-	upload = files.get("simulator_file") if files else None
-	if not upload:
-		return None, APIResponse.failed(message="simulator_file upload is required.", status_code=400)
-	return upload, None
-
-
-def _validate_sandbox_policy(value):
-	try:
-		policy = frappe.parse_json(value)
-	except Exception:
-		return None, APIResponse.failed(message="Sandbox Policy must be valid JSON.", status_code=400)
-
-	if not isinstance(policy, dict):
-		return None, APIResponse.failed(message="Sandbox Policy must be a JSON object.", status_code=400)
-
-	return value, None
-
-
-def _get_boolean(value):
-	if isinstance(value, bool):
-		return value
-	if value is None or value == "":
-		return False
-	if str(value).strip().lower() in {"1", "true", "yes"}:
-		return True
-	if str(value).strip().lower() in {"0", "false", "no"}:
-		return False
-	frappe.throw(_("is_background_plugin must be a boolean value."))
 
 
 def _get_session_service_provider():
@@ -88,97 +29,196 @@ def _get_session_service_provider():
 	return tenant.service_provider, None
 
 
+def _get_metadata():
+	raw = frappe.form_dict.get("metadata")
+	if not raw:
+		return None, APIResponse.failed(message="metadata is required.", status_code=400)
+
+	try:
+		metadata = frappe.parse_json(raw)
+	except Exception:
+		return None, APIResponse.failed(message="metadata must be valid JSON.", status_code=400)
+
+	if not isinstance(metadata, dict):
+		return None, APIResponse.failed(message="metadata must be a JSON object.", status_code=400)
+
+	missing = [
+		fieldname
+		for fieldname in REQUIRED_METADATA_FIELDS
+		if metadata.get(fieldname) is None or str(metadata.get(fieldname)).strip() == ""
+	]
+	if missing:
+		return None, APIResponse.failed(
+			message="Missing metadata fields: " + ", ".join(missing), status_code=400
+		)
+
+	return metadata, None
+
+
+def _get_build_file_upload():
+	request = getattr(frappe, "request", None)
+	files = getattr(request, "files", None) if request else None
+	upload = files.get("build_file") if files else None
+	if not upload:
+		return None, APIResponse.failed(message="build_file upload is required.", status_code=400)
+
+	stream = getattr(upload, "stream", None)
+	content = stream.read() if stream else upload.read()
+	if not content:
+		return None, APIResponse.failed(message="build_file upload is empty.", status_code=400)
+
+	return content, None
+
+
+def _get_boolean(value):
+	if isinstance(value, bool):
+		return value, None
+	if value is None or value == "":
+		return False, None
+	if str(value).strip().lower() in {"1", "true", "yes"}:
+		return True, None
+	if str(value).strip().lower() in {"0", "false", "no"}:
+		return False, None
+	return None, APIResponse.failed(message="is_background_plugin must be a boolean value.", status_code=400)
+
+
+def _parse_config(value):
+	if value is None or value == "":
+		return "{}", None
+	if isinstance(value, dict):
+		return json.dumps(value), None
+	if isinstance(value, str):
+		try:
+			parsed = frappe.parse_json(value)
+		except Exception:
+			return None, APIResponse.failed(message="config must be valid JSON.", status_code=400)
+		if not isinstance(parsed, dict):
+			return None, APIResponse.failed(message="config must be a JSON object.", status_code=400)
+		return json.dumps(parsed), None
+	return None, APIResponse.failed(message="config must be a JSON object.", status_code=400)
+
+
+def _parse_version_part(value, fieldname):
+	try:
+		parsed = int(value)
+	except (TypeError, ValueError):
+		return None, APIResponse.failed(message=f"{fieldname} must be an integer.", status_code=400)
+	if parsed < 0:
+		return None, APIResponse.failed(message=f"{fieldname} must be non-negative.", status_code=400)
+	return parsed, None
+
+
 @frappe.whitelist()
-def create_service_extension_release():
+def create_ps_plugin():
+	"""Create a PS Plugin Service Extension for the caller's tenant service provider."""
 	metadata, error = _get_metadata()
 	if error:
 		return error
-
-	upload, error = _get_simulator_file()
-	if error:
-		return error
-
-	sandbox_policy_json, error = _validate_sandbox_policy(metadata["sandbox_policy_json"])
-	if error:
-		return error
-
-	artifact_sha256 = str(metadata["artifact_sha256"]).strip().lower()
-	if not SHA256_PATTERN.fullmatch(artifact_sha256):
-		return APIResponse.failed(message="artifact_sha256 must be a SHA-256 digest.", status_code=400)
-
-	try:
-		major, minor = parse_manifest_version(metadata["manifest_yaml"])
-		is_background_plugin = _get_boolean(metadata.get("is_background_plugin"))
-	except frappe.ValidationError as error:
-		return APIResponse.failed(message=str(error), status_code=400)
 
 	service_provider, error = _get_session_service_provider()
 	if error:
 		return error
 
 	extension_code = str(metadata["extension_code"]).strip()
-	library_name = str(metadata.get("library_name") or extension_code).strip()
-	extension_type = str(metadata.get("extension_type") or "MC Plugin").strip()
+	title = str(metadata["title"]).strip()
+	library_name = str(metadata["library_name"]).strip()
+	build_file_name = str(metadata["build_file"]).strip()
+	description = str(metadata.get("description") or "")
 
-	if frappe.db.exists(
+	if "_" in extension_code:
+		return APIResponse.failed(message="extension_code cannot contain underscore.", status_code=400)
+
+	major, error = _parse_version_part(metadata["major"], "major")
+	if error:
+		return error
+	minor, error = _parse_version_part(metadata["minor"], "minor")
+	if error:
+		return error
+
+	is_background_plugin, error = _get_boolean(metadata.get("is_background_plugin"))
+	if error:
+		return error
+
+	config, error = _parse_config(metadata.get("config"))
+	if error:
+		return error
+
+	existing_name = frappe.db.exists(
 		"Service Extension",
 		{
 			"service_provider": service_provider,
 			"library_name": library_name,
-			"extension_type": extension_type,
+			"extension_type": PS_PLUGIN_EXTENSION_TYPE,
 			"major": major,
 			"minor": minor,
 		},
-	):
-		return APIResponse.failed(
-			message="A Service Extension with the same library, extension type, and version already exists.",
-			status_code=409,
+	)
+	if existing_name:
+		existing = frappe.get_doc("Service Extension", existing_name)
+		return APIResponse.success(
+			data=_plugin_response_data(existing, build_file_name, skipped=True),
+			message="PS Plugin already exists; skipped without update.",
 		)
+
+	upload_bytes, error = _get_build_file_upload()
+	if error:
+		return error
 
 	doc = frappe.get_doc(
 		{
 			"doctype": "Service Extension",
 			"extension_code": extension_code,
-			"title": str(metadata["title"]).strip(),
+			"title": title,
 			"service_provider": service_provider,
-			"extension_type": extension_type,
+			"extension_type": PS_PLUGIN_EXTENSION_TYPE,
 			"library_name": library_name,
 			"major": major,
 			"minor": minor,
-			"description": str(metadata.get("description") or ""),
-			"is_background_plugin": is_background_plugin,
-			"manifest_yaml": metadata["manifest_yaml"],
-			"sandbox_policy_json": sandbox_policy_json,
-			"artifact_uri": str(metadata["artifact_uri"]).strip(),
-			"artifact_sha256": artifact_sha256,
+			"description": description,
+			"is_background_plugin": 1 if is_background_plugin else 0,
+			"config": config,
 		}
 	)
 
 	try:
 		doc.insert(ignore_permissions=True)
-	except frappe.ValidationError as error:
-		return APIResponse.failed(message=str(error), status_code=400)
+	except frappe.ValidationError as err:
+		return APIResponse.failed(message=str(err), status_code=400)
 
 	file_doc = save_file(
-		getattr(upload, "filename", None) or "simulator-plugin.zip",
-		upload.read(),
+		build_file_name,
+		upload_bytes,
 		doc.doctype,
 		doc.name,
-		is_private=1,
-		df="simulator_file",
+		is_private=0,
+		df="file",
 	)
-	doc.simulator_file = file_doc.file_url
-	doc.save(ignore_permissions=True)
+	doc.reload()
+	doc.file = file_doc.file_url
+	try:
+		doc.save(ignore_permissions=True)
+	except frappe.ValidationError as err:
+		return APIResponse.failed(message=str(err), status_code=400)
 
 	return APIResponse.success(
-		data={
-			"name": doc.name,
-			"service_provider": doc.service_provider,
-			"extension_code": doc.extension_code,
-			"library_name": doc.library_name,
-			"major": doc.major,
-			"minor": doc.minor,
-			"simulator_file": doc.simulator_file,
-		},
-		message="Service Extension release created successfully.",
+		data=_plugin_response_data(doc, build_file_name, skipped=False),
+		message="PS Plugin created successfully.",
 	)
+
+
+def _plugin_response_data(doc, build_file_name, skipped=False):
+	return {
+		"name": doc.name,
+		"service_provider": doc.service_provider,
+		"extension_code": doc.extension_code,
+		"title": doc.title,
+		"library_name": doc.library_name,
+		"build_file": build_file_name,
+		"file": doc.file,
+		"major": doc.major,
+		"minor": doc.minor,
+		"is_background_plugin": bool(doc.is_background_plugin),
+		"config": frappe.parse_json(doc.config or "{}"),
+		"description": doc.description or "",
+		"skipped": skipped,
+	}

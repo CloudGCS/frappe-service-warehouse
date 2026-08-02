@@ -6,10 +6,7 @@ from frappe.tests.utils import FrappeTestCase
 from werkzeug.datastructures import FileStorage
 
 from service_warehouse.service_marketplace.controller.service_extension_controller import (
-	create_service_extension_release,
-)
-from service_warehouse.service_marketplace.doctype.service_extension.service_extension import (
-	parse_manifest_version,
+	create_ps_plugin,
 )
 
 
@@ -20,8 +17,8 @@ class TestServiceExtensionController(FrappeTestCase):
 		self.user = frappe.get_doc(
 			{
 				"doctype": "User",
-				"email": f"release-{suffix.lower()}@example.com",
-				"first_name": "Release",
+				"email": f"ps-plugin-{suffix.lower()}@example.com",
+				"first_name": "PS",
 				"last_name": suffix,
 			}
 		).insert(ignore_permissions=True)
@@ -29,10 +26,10 @@ class TestServiceExtensionController(FrappeTestCase):
 			{
 				"doctype": "Tenant",
 				"tenant_code": f"TEN{suffix}",
-				"tenant_name": f"Release Tenant {suffix}",
+				"tenant_name": f"PS Plugin Tenant {suffix}",
 				"user": self.user.name,
 				"provider_code": f"PRV{suffix}",
-				"provider_title": f"Release Provider {suffix}",
+				"provider_title": f"PS Plugin Provider {suffix}",
 			}
 		).insert(ignore_permissions=True)
 		frappe.set_user(self.user.name)
@@ -40,112 +37,53 @@ class TestServiceExtensionController(FrappeTestCase):
 	def tearDown(self):
 		frappe.set_user("Administrator")
 
-	def test_version_packing(self):
-		self.assertEqual(parse_manifest_version("version: 1.2\n"), (1, 20))
-		self.assertEqual(parse_manifest_version("version: 1.2.3\n"), (1, 23))
-
-	def test_user_entered_version_updates_manifest_version_on_creation(self):
-		doc = frappe.get_doc(
-			{
-				"doctype": "Service Extension",
-				"manifest_yaml": "version: 1.2.8\n",
-				"major": 2,
-				"minor": 0,
-			}
-		)
-
-		doc.validate_manifest_version()
-
-		self.assertEqual((doc.major, doc.minor), (2, 0))
-		self.assertEqual(doc.manifest_yaml, "version: 2.0\n")
-
-	def test_non_mc_plugin_does_not_validate_manifest_version(self):
-		doc = frappe.get_doc(
-			{
-				"doctype": "Service Extension",
-				"extension_type": "Web Application",
-				"manifest_yaml": "version: not-a-version\n",
-			}
-		)
-
-		doc.validate_manifest_version()
-
-	def test_create_release_uses_session_provider_and_attaches_simulator_file(self):
-		response = self._create_release(version="1.2.3")
+	def test_create_ps_plugin_uses_session_provider_and_attaches_build_file(self):
+		response = self._create_plugin()
 
 		self.assertEqual(response["status"], "success")
 		doc = frappe.get_doc("Service Extension", response["data"]["name"])
 		self.assertEqual(doc.service_provider, self.tenant.service_provider)
-		self.assertEqual((doc.major, doc.minor), (1, 23))
-		self.assertEqual(doc.artifact_sha256, "a" * 64)
-		self.assertTrue(doc.simulator_file.startswith("/private/files/"))
+		self.assertEqual(doc.extension_type, "PS Plugin")
+		self.assertEqual((doc.major, doc.minor), (1, 0))
+		self.assertEqual(doc.library_name, "map-plugin")
+		self.assertTrue(doc.file)
+		self.assertTrue(doc.is_background_plugin)
 
-		file_doc = frappe.get_doc("File", {"file_url": doc.simulator_file})
-		self.assertEqual(file_doc.attached_to_field, "simulator_file")
-		self.assertTrue(file_doc.is_private)
+		file_doc = frappe.get_doc("File", {"file_url": doc.file})
+		self.assertEqual(file_doc.attached_to_field, "file")
 
-	def test_duplicate_packed_library_version_is_rejected(self):
-		self._create_release(version="1.2.30")
+	def test_duplicate_library_version_is_skipped(self):
+		first = self._create_plugin()
+		self.assertEqual(first["status"], "success")
+		self.assertFalse(first["data"]["skipped"])
 
-		response = self._create_release(version="1.23.0")
-
-		self.assertEqual(response["status"], "failed")
-		self.assertEqual(frappe.local.response["http_status_code"], 409)
-		self.assertIn("same library, extension type, and version", response["message"])
-
-	def test_same_library_version_is_allowed_for_different_extension_types(self):
-		self._create_release(version="1.2")
-		payload = self._payload(version="1.2")
-		payload["extension_type"] = "PS Plugin"
-
-		response = self._call_controller(payload)
+		response = self._create_plugin()
 
 		self.assertEqual(response["status"], "success")
-		self.assertEqual(response["data"]["major"], 1)
-		self.assertEqual(response["data"]["minor"], 20)
-
-	def test_only_release_artifact_fields_are_mutable(self):
-		response = self._create_release(version="1.2")
-		doc = frappe.get_doc("Service Extension", response["data"]["name"])
-
-		doc.artifact_uri = "s3://bucket/updated-plugin.tar.gz"
-		doc.save(ignore_permissions=True)
-		doc.reload()
-		self.assertEqual(doc.artifact_uri, "s3://bucket/updated-plugin.tar.gz")
-
-		doc.simulator_file = "/private/files/replacement-simulator.zip"
-		doc.save(ignore_permissions=True)
-		doc.reload()
-		self.assertEqual(doc.simulator_file, "/private/files/replacement-simulator.zip")
-
-		doc.title = "Changed title"
-		with self.assertRaises(frappe.ValidationError):
-			doc.save(ignore_permissions=True)
-
-		doc.reload()
-		doc.manifest_yaml = "version: 1.3\n"
-		with self.assertRaises(frappe.ValidationError):
-			doc.save(ignore_permissions=True)
+		self.assertTrue(response["data"]["skipped"])
+		self.assertEqual(response["data"]["name"], first["data"]["name"])
+		self.assertIn("skipped without update", response["message"])
 
 	def test_invalid_request_is_rejected(self):
-		payload = self._payload(version="1.2")
-		payload["artifact_sha256"] = "not-a-checksum"
+		payload = self._payload()
+		del payload["library_name"]
 		response = self._call_controller(payload)
 		self.assertEqual(response["status"], "failed")
 		self.assertEqual(frappe.local.response["http_status_code"], 400)
 
-		payload = self._payload(version="1.2")
-		payload["sandbox_policy_json"] = "[]"
+		payload = self._payload()
+		payload["config"] = "[]"
 		response = self._call_controller(payload)
 		self.assertEqual(response["status"], "failed")
 		self.assertEqual(frappe.local.response["http_status_code"], 400)
 
-		payload = self._payload(version="1.2")
+		payload = self._payload()
 		response = self._call_controller(payload, include_upload=False)
 		self.assertEqual(response["status"], "failed")
 		self.assertEqual(frappe.local.response["http_status_code"], 400)
 
-		payload = self._payload(version="not-a-version")
+		payload = self._payload()
+		payload["extension_code"] = "bad_code"
 		response = self._call_controller(payload)
 		self.assertEqual(response["status"], "failed")
 		self.assertEqual(frappe.local.response["http_status_code"], 400)
@@ -153,22 +91,25 @@ class TestServiceExtensionController(FrappeTestCase):
 	def test_request_without_a_tenant_is_rejected(self):
 		frappe.set_user("Administrator")
 
-		response = self._call_controller(self._payload(version="1.2"))
+		response = self._call_controller(self._payload())
 
 		self.assertEqual(response["status"], "failed")
 		self.assertEqual(frappe.local.response["http_status_code"], 403)
 
-	def _create_release(self, version):
-		return self._call_controller(self._payload(version=version))
+	def _create_plugin(self):
+		return self._call_controller(self._payload())
 
-	def _payload(self, version):
+	def _payload(self):
 		return {
-			"extension_code": f"release{self.tenant.name[-8:].lower()}",
-			"title": "Release Plugin",
-			"manifest_yaml": f"version: {version}\n",
-			"sandbox_policy_json": '{"mode":"bubblewrap","profile":"default"}',
-			"artifact_uri": "s3://bucket/plugin.tar.gz",
-			"artifact_sha256": "A" * 64,
+			"extension_code": f"ps{self.tenant.name[-8:].lower()}",
+			"title": "Map Plugin",
+			"library_name": "map-plugin",
+			"build_file": "map-plugin.js",
+			"is_background_plugin": True,
+			"config": {"entry": "main"},
+			"description": "Pilot Station map plugin",
+			"major": 1,
+			"minor": 0,
 		}
 
 	def _call_controller(self, payload, include_upload=True):
@@ -177,7 +118,7 @@ class TestServiceExtensionController(FrappeTestCase):
 		frappe.local.request = frappe._dict()
 		frappe.local.request.files = {}
 		if include_upload:
-			frappe.local.request.files["simulator_file"] = FileStorage(
-				stream=BytesIO(b"simulator zip bytes"), filename="simulator-plugin.zip"
+			frappe.local.request.files["build_file"] = FileStorage(
+				stream=BytesIO(b"console.log('map');"), filename="map-plugin.js"
 			)
-		return create_service_extension_release()
+		return create_ps_plugin()

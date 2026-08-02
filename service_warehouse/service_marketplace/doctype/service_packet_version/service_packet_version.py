@@ -7,6 +7,7 @@ from frappe.model.document import Document
 
 from service_warehouse.service_warehouse.doctype.tenant.tenant import get_host_user, get_session_tenant
 
+
 class ServicePacketVersion(Document):
   # begin: auto-generated types
   # This code is auto-generated. Do not modify anything in this block.
@@ -25,6 +26,9 @@ class ServicePacketVersion(Document):
     version: DF.Data | None
   # end: auto-generated types
 
+  def validate(self):
+    self._validate_unique_library_names()
+
   def before_insert(self):
     tenant = get_session_tenant()
     if tenant:
@@ -40,6 +44,23 @@ class ServicePacketVersion(Document):
     packet_owner = frappe.db.get_value("Service Packet", self.service_packet, "owner")
     if packet_owner and packet_owner != frappe.session.user:
       frappe.throw(_("You cannot duplicate a service packet version that belongs to another user."))
+
+  def _validate_unique_library_names(self):
+    """Ensure each library_name appears at most once among selected extensions."""
+    seen = {}
+    for row in self.extensions or []:
+      if not row.service_extension:
+        continue
+      library_name = frappe.db.get_value("Service Extension", row.service_extension, "library_name")
+      if not library_name:
+        continue
+      if library_name in seen:
+        frappe.throw(
+          _("Service Extension with library name '{0}' is selected more than once. Only one version per library is allowed.").format(
+            library_name
+          )
+        )
+      seen[library_name] = row.service_extension
 
   def on_submit(self):
     service_packet = frappe.get_doc("Service Packet", self.service_packet)
@@ -58,3 +79,60 @@ class ServicePacketVersion(Document):
       elif version.major == self.major and version.minor >= self.minor:
         return False
     return True
+
+
+@frappe.whitelist()
+def get_latest_extensions(extensions):
+  """Resolve attached Service Extensions to the latest version per library_name.
+
+  Returns a list of Service Extension names (one per unique library_name).
+  """
+  if isinstance(extensions, str):
+    extensions = frappe.parse_json(extensions)
+
+  if not extensions:
+    return []
+
+  extension_names = []
+  for item in extensions:
+    if isinstance(item, dict):
+      name = item.get("service_extension") or item.get("name")
+    else:
+      name = item
+    if name:
+      extension_names.append(name)
+
+  if not extension_names:
+    return []
+
+  current = frappe.get_all(
+    "Service Extension",
+    filters={"name": ["in", extension_names]},
+    fields=["name", "library_name", "service_provider"],
+  )
+
+  # Keep first-seen service_provider per library_name
+  libraries = {}
+  for ext in current:
+    if not ext.library_name:
+      continue
+    if ext.library_name not in libraries:
+      libraries[ext.library_name] = ext.service_provider
+
+  latest_names = []
+  for library_name, service_provider in libraries.items():
+    filters = {"library_name": library_name}
+    if service_provider:
+      filters["service_provider"] = service_provider
+
+    latest = frappe.get_all(
+      "Service Extension",
+      filters=filters,
+      fields=["name"],
+      order_by="major desc, minor desc",
+      limit_page_length=1,
+    )
+    if latest:
+      latest_names.append(latest[0].name)
+
+  return latest_names
