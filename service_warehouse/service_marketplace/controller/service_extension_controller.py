@@ -18,7 +18,7 @@ REQUIRED_METADATA_FIELDS = (
 )
 
 
-def _get_session_service_provider():
+def _get_session_tenant():
 	tenant = get_session_tenant()
 	if not tenant:
 		return None, APIResponse.failed(message="You are not a tenant.", status_code=403)
@@ -26,7 +26,32 @@ def _get_session_service_provider():
 		return None, APIResponse.failed(
 			message="You are not a valid tenant with a defined service provider.", status_code=403
 		)
-	return tenant.service_provider, None
+	return tenant, None
+
+
+def _resolve_service_provider(metadata, tenant):
+	requested = metadata.get("service_provider")
+	if requested is None or requested == "":
+		return tenant.service_provider, False, None
+	if not isinstance(requested, str):
+		return None, False, APIResponse.failed(message="service_provider must be a string.", status_code=400)
+
+	requested = requested.strip()
+	if not requested:
+		return tenant.service_provider, False, None
+	if requested == tenant.service_provider:
+		return requested, False, None
+	if tenant.tenant_code != "HOST":
+		return None, False, APIResponse.failed(
+			message="You are not allowed to publish for another service provider.",
+			status_code=403,
+		)
+	if not frappe.db.exists("Service Provider", requested):
+		return None, False, APIResponse.failed(
+			message=f"Service Provider '{requested}' does not exist.",
+			status_code=400,
+		)
+	return requested, True, None
 
 
 def _get_metadata():
@@ -110,12 +135,19 @@ def _parse_version_part(value, fieldname):
 
 @frappe.whitelist()
 def create_ps_plugin():
-	"""Create a PS Plugin Service Extension for the caller's tenant service provider."""
+	"""Create a PS Plugin Service Extension for the caller's tenant service provider.
+
+	HOST tenants may set metadata.service_provider to publish for another existing provider.
+	"""
 	metadata, error = _get_metadata()
 	if error:
 		return error
 
-	service_provider, error = _get_session_service_provider()
+	tenant, error = _get_session_tenant()
+	if error:
+		return error
+
+	service_provider, explicit_provider, error = _resolve_service_provider(metadata, tenant)
 	if error:
 		return error
 
@@ -179,6 +211,8 @@ def create_ps_plugin():
 			"config": config,
 		}
 	)
+	if explicit_provider:
+		doc.flags.explicit_service_provider = True
 
 	try:
 		doc.insert(ignore_permissions=True)

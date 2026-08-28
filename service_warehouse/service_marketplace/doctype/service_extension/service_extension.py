@@ -25,7 +25,6 @@ IMMUTABLE_FIELDNAMES = (
 	"description",
 	"is_background_plugin",
 	"is_build_in",
-	"files",
 	"config",
 )
 
@@ -172,12 +171,7 @@ class ServiceExtension(Document):
 				frappe.throw(_("{0} cannot be changed after a Service Extension is created.").format(fieldname))
 
 	def immutable_field_changed(self, fieldname, old_doc):
-		if fieldname != "files":
-			return self.get(fieldname) != old_doc.get(fieldname)
-
-		current_files = [row.as_dict() for row in self.get("files", [])]
-		previous_files = [row.as_dict() for row in old_doc.get("files", [])]
-		return current_files != previous_files
+		return self.get(fieldname) != old_doc.get(fieldname)
 
 	def check_for_underscore(self, field_name, value):
 		if "_" in value:
@@ -250,7 +244,13 @@ class ServiceExtension(Document):
 		if not frappe.db.exists("Service Provider", tenant.service_provider):
 			frappe.throw("You are not a valid tenant with well defined service provider.")
 
-		self.service_provider = tenant.service_provider
+		if self.flags.get("explicit_service_provider"):
+			if not self.service_provider or not frappe.db.exists("Service Provider", self.service_provider):
+				frappe.throw(_("Service Provider '{0}' does not exist.").format(self.service_provider))
+			if tenant.tenant_code != "HOST" and self.service_provider != tenant.service_provider:
+				frappe.throw(_("You are not allowed to publish for another service provider."))
+		else:
+			self.service_provider = tenant.service_provider
 
 		if not self.is_version_valid():
 			frappe.throw(_("A Service Extension with the same library, extension type, and version already exists."))
@@ -259,6 +259,12 @@ class ServiceExtension(Document):
 		if self.owner == "Administrator" and self.service_provider == "SYSTEM":
 			self.owner = get_host_user()
 			frappe.db.set_value("Service Extension", self.name, "owner", get_host_user())
+		self.sync_attached_files()
+
+	def on_update(self):
+		self.sync_attached_files()
+
+	def sync_attached_files(self):
 		if not self.files:
 			return
 		for row in self.files:

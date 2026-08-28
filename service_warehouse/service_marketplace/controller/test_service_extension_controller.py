@@ -96,8 +96,111 @@ class TestServiceExtensionController(FrappeTestCase):
 		self.assertEqual(response["status"], "failed")
 		self.assertEqual(frappe.local.response["http_status_code"], 403)
 
+	def test_host_can_publish_for_another_existing_provider(self):
+		target_provider = self._create_service_provider()
+		host = self._ensure_host_tenant()
+		frappe.set_user(host.user)
+
+		payload = self._payload()
+		payload["extension_code"] = f"host{frappe.generate_hash(length=6).lower()}"
+		payload["library_name"] = payload["extension_code"]
+		payload["service_provider"] = target_provider
+		response = self._call_controller(payload)
+
+		self.assertEqual(response["status"], "success")
+		self.assertFalse(response["data"]["skipped"])
+		self.assertEqual(response["data"]["service_provider"], target_provider)
+		doc = frappe.get_doc("Service Extension", response["data"]["name"])
+		self.assertEqual(doc.service_provider, target_provider)
+		self.assertTrue(doc.name.startswith(f"{target_provider}_"))
+
+	def test_host_without_service_provider_uses_session_provider(self):
+		host = self._ensure_host_tenant()
+		frappe.set_user(host.user)
+
+		payload = self._payload()
+		payload["extension_code"] = f"host{frappe.generate_hash(length=6).lower()}"
+		payload["library_name"] = payload["extension_code"]
+		response = self._call_controller(payload)
+
+		self.assertEqual(response["status"], "success")
+		self.assertEqual(response["data"]["service_provider"], host.service_provider)
+		doc = frappe.get_doc("Service Extension", response["data"]["name"])
+		self.assertEqual(doc.service_provider, host.service_provider)
+
+	def test_non_host_cannot_override_service_provider(self):
+		payload = self._payload()
+		payload["service_provider"] = "SYSTEM"
+		response = self._call_controller(payload)
+
+		self.assertEqual(response["status"], "failed")
+		self.assertEqual(frappe.local.response["http_status_code"], 403)
+		self.assertIn("another service provider", response["message"])
+
+	def test_missing_service_provider_is_rejected(self):
+		host = self._ensure_host_tenant()
+		frappe.set_user(host.user)
+
+		payload = self._payload()
+		payload["extension_code"] = f"host{frappe.generate_hash(length=6).lower()}"
+		payload["library_name"] = payload["extension_code"]
+		payload["service_provider"] = "MISSINGPROVIDER"
+		response = self._call_controller(payload)
+
+		self.assertEqual(response["status"], "failed")
+		self.assertEqual(frappe.local.response["http_status_code"], 400)
+		self.assertIn("does not exist", response["message"])
+
 	def _create_plugin(self):
 		return self._call_controller(self._payload())
+
+	def _ensure_host_tenant(self):
+		frappe.set_user("Administrator")
+		if frappe.db.exists("Tenant", "HOST"):
+			host = frappe.get_doc("Tenant", "HOST")
+			if not frappe.db.exists("User", host.user):
+				frappe.get_doc(
+					{
+						"doctype": "User",
+						"email": host.user,
+						"first_name": "Host",
+						"enabled": 1,
+					}
+				).insert(ignore_permissions=True)
+			else:
+				host_user = frappe.get_doc("User", host.user)
+				if not host_user.enabled:
+					host_user.enabled = 1
+					host_user.save(ignore_permissions=True)
+			return host
+
+		user = frappe.get_doc(
+			{
+				"doctype": "User",
+				"email": f"host-{frappe.generate_hash(length=6).lower()}@example.com",
+				"first_name": "Host",
+				"enabled": 1,
+			}
+		).insert(ignore_permissions=True)
+		return frappe.get_doc(
+			{
+				"doctype": "Tenant",
+				"tenant_code": "HOST",
+				"tenant_name": "Host Tenant",
+				"user": user.name,
+				"provider_code": "SYSTEM",
+				"provider_title": "System",
+			}
+		).insert(ignore_permissions=True)
+
+	def _create_service_provider(self):
+		frappe.set_user("Administrator")
+		name = f"PRV{frappe.generate_hash(length=8).upper()}"
+		doc = frappe.new_doc("Service Provider")
+		doc.name = name
+		doc.title = name
+		doc.insert(ignore_permissions=True)
+		return doc.name
 
 	def _payload(self):
 		return {
@@ -118,7 +221,8 @@ class TestServiceExtensionController(FrappeTestCase):
 		frappe.local.request = frappe._dict()
 		frappe.local.request.files = {}
 		if include_upload:
+			content = f"console.log({json.dumps(payload.get('extension_code') or 'map')});".encode()
 			frappe.local.request.files["build_file"] = FileStorage(
-				stream=BytesIO(b"console.log('map');"), filename="map-plugin.js"
+				stream=BytesIO(content), filename="map-plugin.js"
 			)
 		return create_ps_plugin()
